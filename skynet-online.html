@@ -40,7 +40,6 @@
 </head>
 <body>
   <h1>SKYNET // SECTOR ONLINE</h1>
-  <audio id="type-sound" src="https://cdn.jsdelivr.net/gh/naptha/talktype@main/examples/assets/keyboard.wav" preload="auto"></audio>
   <div class="console" id="console"></div>
 
   <script>
@@ -82,7 +81,6 @@ ACCESO A ARCHIVOS DESCLASIFICADOS:
 >> ¿SIGUES INVESTIGANDO?`;
 
     const consoleDiv = document.getElementById("console");
-    const typeSound = document.getElementById("type-sound");
 
     let lineIndex = 0;
     let charIndex = 0;
@@ -92,8 +90,6 @@ ACCESO A ARCHIVOS DESCLASIFICADOS:
         const line = messages[lineIndex];
         if (charIndex <= line.length) {
           consoleDiv.innerHTML = messages.slice(0, lineIndex).join("\n") + "\n" + line.slice(0, charIndex);
-          typeSound.currentTime = 0;
-          typeSound.play();
           charIndex++;
           setTimeout(typeLine, 30);
         } else {
