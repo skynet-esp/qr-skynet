@@ -83,6 +83,30 @@
       opacity: 1;
     }
 
+    #intro {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #intro button {
+      padding: 15px 40px;
+      font-size: 1.2em;
+      background: #0f0;
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 0 20px #0f0;
+    }
+
     @keyframes parpadeo {
       from { opacity: 1; }
       to { opacity: 0.6; }
@@ -108,7 +132,11 @@
   </style>
 </head>
 <body>
-  <div class="contenido">
+  <audio id="intro-sound" src="assets/intro.mp3" preload="auto"></audio>
+  <div id="intro">
+    <button onclick="startExperience()">Entrar a Skynet</button>
+  </div>
+  <div class="contenido" style="display: none;">
     <h1 id="titulo"></h1>
     <p id="texto1"></p>
     <p id="texto2"></p>
@@ -163,6 +191,8 @@
     setInterval(draw, 50);
 
     // Typing Effect
+    const introSound = document.getElementById("intro-sound");
+    const contenido = document.querySelector(".contenido");
     const titulo = document.getElementById("titulo");
     const texto1 = document.getElementById("texto1");
     const texto2 = document.getElementById("texto2");
@@ -176,6 +206,21 @@
 
     let messageIndex = 0;
     let charIndex = 0;
+
+    // Depuración de carga de audio
+    introSound.addEventListener("loadeddata", () => console.log("Audio intro.mp3 loaded successfully"));
+    introSound.addEventListener("error", () => console.error("Failed to load intro.mp3: Check the path assets/intro.mp3"));
+
+    function startExperience() {
+      document.getElementById("intro").style.display = "none";
+      contenido.style.display = "block";
+      try {
+        introSound.play().catch((e) => console.error("Error playing introSound:", e));
+      } catch (e) {
+        console.error("Error playing introSound:", e);
+      }
+      typeText();
+    }
 
     function typeText() {
       if (messageIndex < messages.length) {
@@ -197,9 +242,6 @@
         titulo.style.setProperty('--random-y', Math.random() * 2 - 1);
       }
     }
-
-    // Iniciar el efecto de escritura
-    setTimeout(typeText, 1000);
   </script>
 </body>
 </html>
