@@ -26,11 +26,25 @@
       font-size: 3em;
       animation: parpadeo 2s infinite alternate;
       margin: 0;
+      position: relative;
     }
 
     p {
       font-size: 1.2em;
       margin: 20px 0;
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 10px;
+      height: 1.2em;
+      background: #0f0;
+      vertical-align: middle;
+      animation: blink 0.8s step-end infinite;
+    }
+
+    .glitch {
+      animation: glitch 3s infinite alternate;
     }
 
     button {
@@ -74,17 +88,28 @@
       to { opacity: 0.6; }
     }
 
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    @keyframes glitch {
+      0%, 100% { transform: translate(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translate(calc(2px * var(--random-x)), calc(2px * var(--random-y))); }
+      20%, 40%, 60%, 80% { transform: translate(calc(-2px * var(--random-x)), calc(-2px * var(--random-y))); }
+    }
+
     canvas {
       position: fixed;
       top: 0;
       left: 0;
       z-index: 1;
-      opacity: 0.7; /* Reducir opacidad para mejor legibilidad */
+      opacity: 0.7;
     }
   </style>
 </head>
 <body>
   <audio id="type-sound" src="https://cdn.jsdelivr.net/gh/naptha/talktype@main/examples/assets/keyboard.wav" preload="auto"></audio>
+  <audio id="bg-sound" src="https://cdn.freesound.org/previews/242/242353_4372972-lq.mp3" loop preload="auto"></audio>
   <div class="contenido">
     <h1 id="titulo"></h1>
     <p id="texto1"></p>
@@ -112,28 +137,39 @@
     const fontSize = 14;
     const columns = canvas.width / fontSize;
     const drops = [];
+    const speeds = [];
+    const opacities = [];
 
-    // Inicializar columnas con posiciones aleatorias
+    // Inicializar columnas con posiciones, velocidades y opacidades aleatorias
     for (let x = 0; x < columns; x++) {
       drops[x] = Math.random() * canvas.height / fontSize;
+      speeds[x] = 0.5 + Math.random() * 1.5; // Velocidad entre 0.5 y 2
+      opacities[x] = 0.3 + Math.random() * 0.7; // Opacidad entre 0.3 y 1
     }
 
     function draw() {
       ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.fillStyle = "#0F0";
-      ctx.font = fontSize + "px Courier New";
-
       for (let i = 0; i < drops.length; i++) {
         const text = letters.charAt(Math.floor(Math.random() * letters.length));
+        ctx.fillStyle = `rgba(0, 255, 0, ${opacities[i]})`;
+        ctx.font = fontSize + "px Courier New";
         ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        // Añadir rastro con opacidad menor
+        ctx.fillStyle = `rgba(0, 255, 0, ${opacities[i] * 0.5})`;
+        ctx.fillText(text, i * fontSize, (drops[i] - 1) * fontSize);
+        ctx.fillStyle = `rgba(0, 255, 0, ${opacities[i] * 0.2})`;
+        ctx.fillText(text, i * fontSize, (drops[i] - 2) * fontSize);
+
+        drops[i] += speeds[i];
 
         if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
           drops[i] = 0;
+          speeds[i] = 0.5 + Math.random() * 1.5;
+          opacities[i] = 0.3 + Math.random() * 0.7;
         }
-
-        drops[i]++;
       }
     }
 
@@ -141,6 +177,7 @@
 
     // Typing Effect
     const typeSound = document.getElementById("type-sound");
+    const bgSound = document.getElementById("bg-sound");
     const titulo = document.getElementById("titulo");
     const texto1 = document.getElementById("texto1");
     const texto2 = document.getElementById("texto2");
@@ -160,7 +197,7 @@
         const currentMessage = messages[messageIndex];
         if (charIndex <= currentMessage.length) {
           const targetElement = [titulo, texto1, texto2][messageIndex];
-          targetElement.textContent = currentMessage.slice(0, charIndex);
+          targetElement.innerHTML = currentMessage.slice(0, charIndex) + (charIndex < currentMessage.length ? '<span class="cursor"></span>' : '');
           if (charIndex % 2 === 0) {
             typeSound.currentTime = 0;
             try {
@@ -176,10 +213,21 @@
         }
       } else {
         boton.classList.add("visible");
+        titulo.classList.add("glitch");
+        // Aplicar glitch con valores aleatorios
+        titulo.style.setProperty('--random-x', Math.random() * 2 - 1);
+        titulo.style.setProperty('--random-y', Math.random() * 2 - 1);
       }
     }
 
-    // Iniciar el efecto de escritura después de un pequeño retraso
+    // Iniciar sonido ambiental después de interacción
+    document.addEventListener("click", () => {
+      try {
+        bgSound.play().catch(() => {});
+      } catch (e) {}
+    }, { once: true });
+
+    // Iniciar el efecto de escritura
     setTimeout(typeText, 1000);
   </script>
 </body>
