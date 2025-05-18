@@ -26,43 +26,99 @@
     a:hover {
       color: #ffffff;
     }
+    .hidden {
+      display: none;
+    }
+    .loading {
+      font-style: italic;
+      animation: blink 0.8s step-end infinite;
+    }
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
   </style>
 </head>
 <body>
   <h1>SKYNET // SECTOR ONLINE</h1>
-  <div class="console">
->> INICIANDO PROTOCOLO SKYNET [V4.2]  
->> AUTENTICANDO ACCESO...  
->> CONEXIÓN ESTABLECIDA  
+  <div class="console" id="console"></div>
 
+  <script>
+    const messages = [
+      ">> INICIANDO PROTOCOLO SKYNET [V4.2]",
+      ">> AUTENTICANDO ACCESO...",
+      ">> CONEXIÓN ESTABLECIDA"
+    ];
+
+    const loadingDots = [".", "..", "...", "....", "....."];
+    const finalContent = `
 ACCESO A ARCHIVOS DESCLASIFICADOS:
 
 [🧠] El algoritmo de Pedro  
-    → <a href="https://manacorcomarcal.com/el-algoritmo-de-pedro-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/el-algoritmo-de-pedro-por-jordi-skynet/</a>  
+    → https://manacorcomarcal.com/el-algoritmo-de-pedro-por-jordi-skynet/
 
 [🎭] Fins als ous: La isla de los figurantes  
-    → <a href="https://manacorcomarcal.com/fins-als-ous-la-isla-de-los-figurantes-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/fins-als-ous-la-isla-de-los-figurantes-por-jordi-skynet/</a>  
+    → https://manacorcomarcal.com/fins-als-ous-la-isla-de-los-figurantes-por-jordi-skynet/
 
 [📚] En Miquel Galliner i el gegant del Regà  
-    → <a href="https://manacorcomarcal.com/en-miquel-galliner-i-el-gegant-del-rega-per-jordi-skynet/" target="_blank">https://manacorcomarcal.com/en-miquel-galliner-i-el-gegant-del-rega-per-jordi-skynet/</a>  
+    → https://manacorcomarcal.com/en-miquel-galliner-i-el-gegant-del-rega-per-jordi-skynet/
 
 [✏️] Del lápiz al prompt: el salto invisible  
-    → <a href="https://manacorcomarcal.com/del-lapiz-al-prompt-el-salto-invisible-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/del-lapiz-al-prompt-el-salto-invisible-por-jordi-skynet/</a>  
+    → https://manacorcomarcal.com/del-lapiz-al-prompt-el-salto-invisible-por-jordi-skynet/
 
 [🔥] No olvido ni perdono  
-    → <a href="https://manacorcomarcal.com/no-olvido-ni-perdono-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/no-olvido-ni-perdono-por-jordi-skynet/</a>  
+    → https://manacorcomarcal.com/no-olvido-ni-perdono-por-jordi-skynet/
 
 [💸] 875 pesetas  
-    → <a href="https://manacorcomarcal.com/875-pesetas-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/875-pesetas-por-jordi-skynet/</a>  
+    → https://manacorcomarcal.com/875-pesetas-por-jordi-skynet/
 
 [📜] De Sócrates a Tipo: breve historia de cómo nos jodimos  
-    → <a href="https://manacorcomarcal.com/de-socrates-a-tipo-breve-historia-de-como-nos-jodimos-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/de-socrates-a-tipo-breve-historia-de-como-nos-jodimos-por-jordi-skynet/</a>  
+    → https://manacorcomarcal.com/de-socrates-a-tipo-breve-historia-de-como-nos-jodimos-por-jordi-skynet/
 
 [☢️] La pendiente del Apocalipsis  
-    → <a href="https://manacorcomarcal.com/la-pendiente-del-apocalipsis-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/la-pendiente-del-apocalipsis-por-jordi-skynet/</a>  
+    → https://manacorcomarcal.com/la-pendiente-del-apocalipsis-por-jordi-skynet/
 
->> FIN DE ARCHIVOS DISPONIBLES  
->> ¿SIGUES INVESTIGANDO?
-  </div>
+>> FIN DE ARCHIVOS DISPONIBLES
+>> ¿SIGUES INVESTIGANDO?`;
+
+    const consoleDiv = document.getElementById("console");
+
+    let lineIndex = 0;
+    let charIndex = 0;
+
+    function typeLine() {
+      if (lineIndex < messages.length) {
+        const line = messages[lineIndex];
+        if (charIndex <= line.length) {
+          consoleDiv.innerHTML = messages.slice(0, lineIndex).join("\n") + "\n" + line.slice(0, charIndex);
+          charIndex++;
+          setTimeout(typeLine, 30);
+        } else {
+          lineIndex++;
+          charIndex = 0;
+          setTimeout(typeLine, 500);
+        }
+      } else {
+        simulateLoading();
+      }
+    }
+
+    function simulateLoading() {
+      let i = 0;
+      const interval = setInterval(() => {
+        consoleDiv.innerHTML = messages.join("\n") + "\n\nCARGANDO" + loadingDots[i % loadingDots.length];
+        i++;
+        if (i > 12) {
+          clearInterval(interval);
+          showFinalContent();
+        }
+      }, 400);
+    }
+
+    function showFinalContent() {
+      consoleDiv.innerHTML = messages.join("\n") + "\n\n" + finalContent;
+    }
+
+    typeLine();
+  </script>
 </body>
 </html>
