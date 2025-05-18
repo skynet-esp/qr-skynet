@@ -83,16 +83,6 @@
       opacity: 1;
     }
 
-    .sound-toggle {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      color: #0f0;
-      cursor: pointer;
-      font-size: 0.9em;
-      z-index: 20;
-    }
-
     @keyframes parpadeo {
       from { opacity: 1; }
       to { opacity: 0.6; }
@@ -118,9 +108,6 @@
   </style>
 </head>
 <body>
-  <audio id="type-sound" src="assets/keyboard.wav" preload="auto"></audio>
-  <audio id="bg-sound" src="assets/matrix-bg.mp3" loop preload="auto"></audio>
-  <div class="sound-toggle" id="sound-toggle">🔊 Activar sonido</div>
   <div class="contenido">
     <h1 id="titulo"></h1>
     <p id="texto1"></p>
@@ -144,51 +131,38 @@
     canvas.height = window.innerHeight;
     canvas.width = window.innerWidth;
 
-    const chars = "アカサタナハマヤラワガザダバパイキシチニヒミリヰギジヂビピウクスツヌフムユルグズブヅプエケセテネヘメレヱゲゼデベペオコソトノホモヨロヲゴゾドボポン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // Más katakana
-    const fontSize = 14; // Tamaño estándar para estilo Matrix
+    const chars = "アカサタナハマヤラワガザダバパイキシチニヒミリヰギジヂビピウクスツヌフムユルグズブヅプエケセテネヘメレヱゲゼデベペオコソトノホモヨロヲゴゾドボポン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const fontSize = 14;
     const columns = canvas.width / fontSize;
     const drops = [];
 
-    // Inicializar columnas con posiciones aleatorias
     for (let x = 0; x < columns; x++) {
       drops[x] = Math.random() * canvas.height / fontSize;
     }
 
     function draw() {
-      // Fondo con desvanecimiento suave
       ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-
       ctx.font = fontSize + "px monospace";
 
       for (let i = 0; i < drops.length; i++) {
-        // Caracter principal en verde brillante
         const text = chars.charAt(Math.floor(Math.random() * chars.length));
         ctx.fillStyle = "#0f0";
         ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-        // Caracteres con opacidad variable para rastro
         ctx.fillStyle = "rgba(0, 255, 0, 0.5)";
         ctx.fillText(text, i * fontSize, (drops[i] - 1) * fontSize);
         ctx.fillStyle = "rgba(0, 255, 0, 0.2)";
         ctx.fillText(text, i * fontSize, (drops[i] - 2) * fontSize);
-
-        // Velocidad constante (inspirada en repositorio)
         drops[i] += 1;
-
-        // Reiniciar columna al llegar abajo
         if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
           drops[i] = 0;
         }
       }
     }
 
-    setInterval(draw, 50); // Ritmo estándar para fluidez
+    setInterval(draw, 50);
 
     // Typing Effect
-    const typeSound = document.getElementById("type-sound");
-    const bgSound = document.getElementById("bg-sound");
-    const soundToggle = document.getElementById("sound-toggle");
     const titulo = document.getElementById("titulo");
     const texto1 = document.getElementById("texto1");
     const texto2 = document.getElementById("texto2");
@@ -202,7 +176,6 @@
 
     let messageIndex = 0;
     let charIndex = 0;
-    let soundEnabled = false;
 
     function typeText() {
       if (messageIndex < messages.length) {
@@ -210,12 +183,6 @@
         if (charIndex <= currentMessage.length) {
           const targetElement = [titulo, texto1, texto2][messageIndex];
           targetElement.innerHTML = currentMessage.slice(0, charIndex) + (charIndex < currentMessage.length ? '<span class="cursor"></span>' : '');
-          if (soundEnabled && charIndex % 2 === 0) {
-            typeSound.currentTime = 0;
-            try {
-              typeSound.play().catch(() => {});
-            } catch (e) {}
-          }
           charIndex++;
           setTimeout(typeText, 60);
         } else {
@@ -230,20 +197,6 @@
         titulo.style.setProperty('--random-y', Math.random() * 2 - 1);
       }
     }
-
-    // Toggle para sonido
-    soundToggle.addEventListener("click", () => {
-      soundEnabled = !soundEnabled;
-      soundToggle.textContent = soundEnabled ? "🔇 Silenciar sonido" : "🔊 Activar sonido";
-      if (soundEnabled) {
-        try {
-          bgSound.play().catch(() => {});
-        } catch (e) {}
-      } else {
-        bgSound.pause();
-        bgSound.currentTime = 0;
-      }
-    });
 
     // Iniciar el efecto de escritura
     setTimeout(typeText, 1000);
