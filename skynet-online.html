@@ -26,9 +26,6 @@
     a:hover {
       color: #ffffff;
     }
-    .hidden {
-      display: none;
-    }
     .loading {
       font-style: italic;
       animation: blink 0.8s step-end infinite;
@@ -92,10 +89,12 @@ ACCESO A ARCHIVOS DESCLASIFICADOS:
       if (lineIndex < messages.length) {
         const line = messages[lineIndex];
         if (charIndex <= line.length) {
-          consoleDiv.innerHTML = messages.slice(0, lineIndex).join("\n") + "\n" + line.slice(0, charIndex);
+          consoleDiv.innerHTML = messages.slice(0, lineIndex).join("<br>") + "<br>" + line.slice(0, charIndex);
           if (charIndex % 2 === 0) {
             typeSound.currentTime = 0;
-            typeSound.play();
+            try {
+              typeSound.play().catch(() => {}); // Manejo de error para navegadores estrictos
+            } catch (e) {}
           }
           charIndex++;
           setTimeout(typeLine, 30);
@@ -112,7 +111,7 @@ ACCESO A ARCHIVOS DESCLASIFICADOS:
     function simulateLoading() {
       let i = 0;
       const interval = setInterval(() => {
-        consoleDiv.innerHTML = messages.join("\n") + "\n\nCARGANDO" + loadingDots[i % loadingDots.length];
+        consoleDiv.innerHTML = messages.join("<br>") + "<br><br>CARGANDO" + loadingDots[i % loadingDots.length];
         i++;
         if (i > 12) {
           clearInterval(interval);
@@ -122,24 +121,19 @@ ACCESO A ARCHIVOS DESCLASIFICADOS:
     }
 
     function showFinalHTML() {
-      const typedPart = messages.join("
-") + "
-
-";
+      const typedPart = messages.join("<br>") + "<br><br>";
       const container = document.createElement("div");
-      container.innerHTML = htmlLinks;
+      container.innerHTML = htmlLinks.replace(/\n/g, "<br>"); // Convertir \n a <br> para HTML
       container.style.opacity = 0;
       container.style.transition = "opacity 1.2s ease";
       consoleDiv.innerHTML = typedPart;
-      setTimeout(() => {
-        consoleDiv.appendChild(container);
-        requestAnimationFrame(() => {
-          container.style.opacity = 1;
-        });
-      }, 500);
-    }
+      consoleDiv.appendChild(container);
+      requestAnimationFrame(() => {
+        container.style.opacity = 1;
+      });
     }
 
+    // Iniciar la animación
     typeLine();
   </script>
 </body>
