@@ -83,28 +83,14 @@
       opacity: 1;
     }
 
-    #intro {
+    .sound-toggle {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #000;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #intro button {
-      padding: 15px 40px;
-      font-size: 1.2em;
-      background: #0f0;
-      color: #000;
-      border: none;
-      border-radius: 10px;
+      top: 20px;
+      right: 20px;
+      color: #0f0;
       cursor: pointer;
-      box-shadow: 0 0 20px #0f0;
+      font-size: 0.9em;
+      z-index: 20;
     }
 
     @keyframes parpadeo {
@@ -133,10 +119,8 @@
 </head>
 <body>
   <audio id="intro-sound" src="assets/intro.mp3" preload="auto"></audio>
-  <div id="intro">
-    <button onclick="startExperience()">Entrar a Skynet</button>
-  </div>
-  <div class="contenido" style="display: none;">
+  <div class="sound-toggle" id="sound-toggle">🔊 Activar sonido</div>
+  <div class="contenido">
     <h1 id="titulo"></h1>
     <p id="texto1"></p>
     <p id="texto2"></p>
@@ -156,43 +140,51 @@
     const canvas = document.getElementById("matrix");
     const ctx = canvas.getContext("2d");
 
-    canvas.height = window.innerHeight;
-    canvas.width = window.innerWidth;
+    if (!ctx) {
+      console.error("No se pudo obtener el contexto 2D del canvas");
+    } else {
+      canvas.height = window.innerHeight;
+      canvas.width = window.innerWidth;
 
-    const chars = "アカサタナハマヤラワガザダバパイキシチニヒミリヰギジヂビピウクスツヌフムユルグズブヅプエケセテネヘメレヱゲゼデベペオコソトノホモヨロヲゴゾドボポン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const fontSize = 14;
-    const columns = canvas.width / fontSize;
-    const drops = [];
+      const chars = "アカサタナハマヤラワガザダバパイキシチニヒミリヰギジヂビピウクスツヌフムユルグズブヅプエケセテネヘメレヱゲゼデベペオコソトノホモヨロヲゴゾドボポン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      const fontSize = 14;
+      const columns = canvas.width / fontSize;
+      const drops = [];
 
-    for (let x = 0; x < columns; x++) {
-      drops[x] = Math.random() * canvas.height / fontSize;
-    }
+      for (let x = 0; x < columns; x++) {
+        drops[x] = Math.random() * canvas.height / fontSize;
+      }
 
-    function draw() {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.font = fontSize + "px monospace";
+      function draw() {
+        try {
+          ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.font = fontSize + "px monospace";
 
-      for (let i = 0; i < drops.length; i++) {
-        const text = chars.charAt(Math.floor(Math.random() * chars.length));
-        ctx.fillStyle = "#0f0";
-        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-        ctx.fillStyle = "rgba(0, 255, 0, 0.5)";
-        ctx.fillText(text, i * fontSize, (drops[i] - 1) * fontSize);
-        ctx.fillStyle = "rgba(0, 255, 0, 0.2)";
-        ctx.fillText(text, i * fontSize, (drops[i] - 2) * fontSize);
-        drops[i] += 1;
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0;
+          for (let i = 0; i < drops.length; i++) {
+            const text = chars.charAt(Math.floor(Math.random() * chars.length));
+            ctx.fillStyle = "#0f0";
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+            ctx.fillStyle = "rgba(0, 255, 0, 0.5)";
+            ctx.fillText(text, i * fontSize, (drops[i] - 1) * fontSize);
+            ctx.fillStyle = "rgba(0, 255, 0, 0.2)";
+            ctx.fillText(text, i * fontSize, (drops[i] - 2) * fontSize);
+            drops[i] += 1;
+            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+              drops[i] = 0;
+            }
+          }
+        } catch (e) {
+          console.error("Error en la función draw:", e);
         }
       }
-    }
 
-    setInterval(draw, 50);
+      setInterval(draw, 50);
+    }
 
     // Typing Effect
     const introSound = document.getElementById("intro-sound");
-    const contenido = document.querySelector(".contenido");
+    const soundToggle = document.getElementById("sound-toggle");
     const titulo = document.getElementById("titulo");
     const texto1 = document.getElementById("texto1");
     const texto2 = document.getElementById("texto2");
@@ -206,42 +198,55 @@
 
     let messageIndex = 0;
     let charIndex = 0;
+    let soundEnabled = false;
 
     // Depuración de carga de audio
     introSound.addEventListener("loadeddata", () => console.log("Audio intro.mp3 loaded successfully"));
     introSound.addEventListener("error", () => console.error("Failed to load intro.mp3: Check the path assets/intro.mp3"));
 
-    function startExperience() {
-      document.getElementById("intro").style.display = "none";
-      contenido.style.display = "block";
+    function typeText() {
       try {
-        introSound.play().catch((e) => console.error("Error playing introSound:", e));
+        if (messageIndex < messages.length) {
+          const currentMessage = messages[messageIndex];
+          if (charIndex <= currentMessage.length) {
+            const targetElement = [titulo, texto1, texto2][messageIndex];
+            targetElement.innerHTML = currentMessage.slice(0, charIndex) + (charIndex < currentMessage.length ? '<span class="cursor"></span>' : '');
+            charIndex++;
+            setTimeout(typeText, 60);
+          } else {
+            messageIndex++;
+            charIndex = 0;
+            setTimeout(typeText, 500);
+          }
+        } else {
+          boton.classList.add("visible");
+          titulo.classList.add("glitch");
+          titulo.style.setProperty('--random-x', Math.random() * 2 - 1);
+          titulo.style.setProperty('--random-y', Math.random() * 2 - 1);
+        }
       } catch (e) {
-        console.error("Error playing introSound:", e);
+        console.error("Error en la función typeText:", e);
       }
-      typeText();
     }
 
-    function typeText() {
-      if (messageIndex < messages.length) {
-        const currentMessage = messages[messageIndex];
-        if (charIndex <= currentMessage.length) {
-          const targetElement = [titulo, texto1, texto2][messageIndex];
-          targetElement.innerHTML = currentMessage.slice(0, charIndex) + (charIndex < currentMessage.length ? '<span class="cursor"></span>' : '');
-          charIndex++;
-          setTimeout(typeText, 60);
-        } else {
-          messageIndex++;
-          charIndex = 0;
-          setTimeout(typeText, 500);
+    // Toggle para sonido
+    soundToggle.addEventListener("click", () => {
+      soundEnabled = !soundEnabled;
+      soundToggle.textContent = soundEnabled ? "🔇 Silenciar sonido" : "🔊 Activar sonido";
+      if (soundEnabled) {
+        try {
+          introSound.play().catch((e) => console.error("Error playing introSound:", e));
+        } catch (e) {
+          console.error("Error playing introSound:", e);
         }
       } else {
-        boton.classList.add("visible");
-        titulo.classList.add("glitch");
-        titulo.style.setProperty('--random-x', Math.random() * 2 - 1);
-        titulo.style.setProperty('--random-y', Math.random() * 2 - 1);
+        introSound.pause();
+        introSound.currentTime = 0;
       }
-    }
+    });
+
+    // Iniciar el efecto de escritura
+    setTimeout(typeText, 1000);
   </script>
 </body>
 </html>
