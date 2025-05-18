@@ -3,10 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <title>Skynet secreto</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #0f0;
+      font-family: monospace;
+      text-align: center;
+      padding: 60px;
+    }
+    .glow {
+      animation: glow 1.5s infinite alternate;
+    }
+    @keyframes glow {
+      from { text-shadow: 0 0 5px #0f0; }
+      to   { text-shadow: 0 0 20px #0f0; }
+    }
+    button {
+      margin-top: 40px;
+      padding: 10px 30px;
+      font-size: 16px;
+      cursor: pointer;
+      background: #0f0;
+      color: #000;
+      border: none;
+      border-radius: 8px;
+    }
+  </style>
 </head>
-<body style="font-family:sans-serif; text-align:center; background:#000; color:#0f0; padding: 50px;">
-  <h1>Has cruzado el umbral.</h1>
-  <p>Esto no es una promoción.<br>Es una prueba de curiosidad.<br><br>Y tú la has superado.</p>
-  <p>🧠 Skynet observa.</p>
+<body>
+  <h1 class="glow">Has cruzado el umbral</h1>
+  <p>La curiosidad te ha traído hasta aquí.</p>
+  <p>No estás solo. Pero no todos llegan.</p>
+  <br>
+  <p>🧠 Skynet te ha observado. Ya formas parte.</p>
+
+  <button onclick="window.location.href='https://www.youtube.com/watch?v=dQw4w9WgXcQ'">Acceder al núcleo</button>
 </body>
 </html>
