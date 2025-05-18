@@ -51,35 +51,36 @@
     ];
 
     const loadingDots = [".", "..", "...", "....", "....."];
-    const finalLines = [
-      "ACCESO A ARCHIVOS DESCLASIFICADOS:\n",
-      "[🧠] El algoritmo de Pedro",
-      "    → https://manacorcomarcal.com/el-algoritmo-de-pedro-por-jordi-skynet/",
-      "",
-      "[🎭] Fins als ous: La isla de los figurantes",
-      "    → https://manacorcomarcal.com/fins-als-ous-la-isla-de-los-figurantes-por-jordi-skynet/",
-      "",
-      "[📚] En Miquel Galliner i el gegant del Regà",
-      "    → https://manacorcomarcal.com/en-miquel-galliner-i-el-gegant-del-rega-per-jordi-skynet/",
-      "",
-      "[✏️] Del lápiz al prompt: el salto invisible",
-      "    → https://manacorcomarcal.com/del-lapiz-al-prompt-el-salto-invisible-por-jordi-skynet/",
-      "",
-      "[🔥] No olvido ni perdono",
-      "    → https://manacorcomarcal.com/no-olvido-ni-perdono-por-jordi-skynet/",
-      "",
-      "[💸] 875 pesetas",
-      "    → https://manacorcomarcal.com/875-pesetas-por-jordi-skynet/",
-      "",
-      "[📜] De Sócrates a Tipo: breve historia de cómo nos jodimos",
-      "    → https://manacorcomarcal.com/de-socrates-a-tipo-breve-historia-de-como-nos-jodimos-por-jordi-skynet/",
-      "",
-      "[☢️] La pendiente del Apocalipsis",
-      "    → https://manacorcomarcal.com/la-pendiente-del-apocalipsis-por-jordi-skynet/",
-      "",
-      ">> FIN DE ARCHIVOS DISPONIBLES",
-      ">> ¿SIGUES INVESTIGANDO?"
-    ];
+
+    const htmlLinks = `
+ACCESO A ARCHIVOS DESCLASIFICADOS:
+
+[🧠] El algoritmo de Pedro  
+→ <a href="https://manacorcomarcal.com/el-algoritmo-de-pedro-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/el-algoritmo-de-pedro-por-jordi-skynet/</a>
+
+[🎭] Fins als ous: La isla de los figurantes  
+→ <a href="https://manacorcomarcal.com/fins-als-ous-la-isla-de-los-figurantes-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/fins-als-ous-la-isla-de-los-figurantes-por-jordi-skynet/</a>
+
+[📚] En Miquel Galliner i el gegant del Regà  
+→ <a href="https://manacorcomarcal.com/en-miquel-galliner-i-el-gegant-del-rega-per-jordi-skynet/" target="_blank">https://manacorcomarcal.com/en-miquel-galliner-i-el-gegant-del-rega-per-jordi-skynet/</a>
+
+[✏️] Del lápiz al prompt: el salto invisible  
+→ <a href="https://manacorcomarcal.com/del-lapiz-al-prompt-el-salto-invisible-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/del-lapiz-al-prompt-el-salto-invisible-por-jordi-skynet/</a>
+
+[🔥] No olvido ni perdono  
+→ <a href="https://manacorcomarcal.com/no-olvido-ni-perdono-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/no-olvido-ni-perdono-por-jordi-skynet/</a>
+
+[💸] 875 pesetas  
+→ <a href="https://manacorcomarcal.com/875-pesetas-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/875-pesetas-por-jordi-skynet/</a>
+
+[📜] De Sócrates a Tipo: breve historia de cómo nos jodimos  
+→ <a href="https://manacorcomarcal.com/de-socrates-a-tipo-breve-historia-de-como-nos-jodimos-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/de-socrates-a-tipo-breve-historia-de-como-nos-jodimos-por-jordi-skynet/</a>
+
+[☢️] La pendiente del Apocalipsis  
+→ <a href="https://manacorcomarcal.com/la-pendiente-del-apocalipsis-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/la-pendiente-del-apocalipsis-por-jordi-skynet/</a>
+
+>> FIN DE ARCHIVOS DISPONIBLES
+>> ¿SIGUES INVESTIGANDO?`;
 
     const consoleDiv = document.getElementById("console");
     const typeSound = document.getElementById("type-sound");
@@ -115,33 +116,14 @@
         i++;
         if (i > 12) {
           clearInterval(interval);
-          typeFinalContent();
+          showFinalHTML();
         }
       }, 400);
     }
 
-    let finalLine = 0;
-    let finalChar = 0;
-
-    function typeFinalContent() {
-      if (finalLine < finalLines.length) {
-        const line = finalLines[finalLine];
-        const currentText = consoleDiv.innerHTML.split("\n\n")[0];
-        const typed = finalLines.slice(0, finalLine).join("\n") + "\n" + line.slice(0, finalChar);
-        consoleDiv.innerHTML = currentText + "\n\n" + typed;
-        if (finalChar % 2 === 0 && line.length > 0) {
-          typeSound.currentTime = 0;
-          typeSound.play();
-        }
-        if (finalChar < line.length) {
-          finalChar++;
-          setTimeout(typeFinalContent, 20);
-        } else {
-          finalLine++;
-          finalChar = 0;
-          setTimeout(typeFinalContent, 200);
-        }
-      }
+    function showFinalHTML() {
+      const typedPart = messages.join("\n") + "\n\n";
+      consoleDiv.innerHTML = typedPart + htmlLinks;
     }
 
     typeLine();
