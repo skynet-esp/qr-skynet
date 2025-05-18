@@ -118,8 +118,8 @@
   </style>
 </head>
 <body>
-  <audio id="type-sound" src="https://cdn.jsdelivr.net/gh/naptha/talktype@main/examples/assets/keyboard.wav" preload="auto"></audio>
-  <audio id="bg-sound" src="https://cdn.freesound.org/previews/242/242353_4372972-lq.mp3" loop preload="auto"></audio>
+  <audio id="type-sound" src="assets/keyboard.wav" preload="auto"></audio>
+  <audio id="bg-sound" src="assets/matrix-bg.mp3" loop preload="auto"></audio>
   <div class="sound-toggle" id="sound-toggle">🔊 Activar sonido</div>
   <div class="contenido">
     <h1 id="titulo"></h1>
@@ -137,54 +137,53 @@
   <canvas id="matrix"></canvas>
 
   <script>
-    // Matrix Rain
+    // Matrix Rain (inspirado en hongbo-wei/matrix)
     const canvas = document.getElementById("matrix");
     const ctx = canvas.getContext("2d");
 
     canvas.height = window.innerHeight;
     canvas.width = window.innerWidth;
 
-    const letters = "アァイィウエカキクケコサシスセソタチツテナニヌネハヒフヘホマミムメヤユヨラリルレロワヲンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    const fontSize = 16; // Aumentado para mejor legibilidad
+    const chars = "アカサタナハマヤラワガザダバパイキシチニヒミリヰギジヂビピウクスツヌフムユルグズブヅプエケセテネヘメレヱゲゼデベペオコソトノホモヨロヲゴゾドボポン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // Más katakana
+    const fontSize = 14; // Tamaño estándar para estilo Matrix
     const columns = canvas.width / fontSize;
     const drops = [];
-    const speeds = [];
-    const opacities = [];
 
-    // Inicializar columnas con posiciones, velocidades y opacidades aleatorias
+    // Inicializar columnas con posiciones aleatorias
     for (let x = 0; x < columns; x++) {
       drops[x] = Math.random() * canvas.height / fontSize;
-      speeds[x] = 0.3 + Math.random() * 0.7; // Velocidad reducida (0.3 a 1)
-      opacities[x] = 0.5 + Math.random() * 0.5; // Opacidad entre 0.5 y 1
     }
 
     function draw() {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+      // Fondo con desvanecimiento suave
+      ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+      ctx.font = fontSize + "px monospace";
+
       for (let i = 0; i < drops.length; i++) {
-        const text = letters.charAt(Math.floor(Math.random() * letters.length));
-        ctx.fillStyle = `rgba(0, 255, 0, ${opacities[i]})`;
-        ctx.font = fontSize + "px Courier New";
+        // Caracter principal en verde brillante
+        const text = chars.charAt(Math.floor(Math.random() * chars.length));
+        ctx.fillStyle = "#0f0";
         ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
-        // Rastros con opacidad reducida
-        ctx.fillStyle = `rgba(0, 255, 0, ${opacities[i] * 0.4})`;
+        // Caracteres con opacidad variable para rastro
+        ctx.fillStyle = "rgba(0, 255, 0, 0.5)";
         ctx.fillText(text, i * fontSize, (drops[i] - 1) * fontSize);
-        ctx.fillStyle = `rgba(0, 255, 0, ${opacities[i] * 0.15})`;
+        ctx.fillStyle = "rgba(0, 255, 0, 0.2)";
         ctx.fillText(text, i * fontSize, (drops[i] - 2) * fontSize);
 
-        drops[i] += speeds[i];
+        // Velocidad constante (inspirada en repositorio)
+        drops[i] += 1;
 
+        // Reiniciar columna al llegar abajo
         if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
           drops[i] = 0;
-          speeds[i] = 0.3 + Math.random() * 0.7;
-          opacities[i] = 0.5 + Math.random() * 0.5;
         }
       }
     }
 
-    setInterval(draw, 50); // Intervalo aumentado para movimiento más suave
+    setInterval(draw, 50); // Ritmo estándar para fluidez
 
     // Typing Effect
     const typeSound = document.getElementById("type-sound");
@@ -218,7 +217,7 @@
             } catch (e) {}
           }
           charIndex++;
-          setTimeout(typeText, 60); // Ligeramente más lento para mejor ritmo
+          setTimeout(typeText, 60);
         } else {
           messageIndex++;
           charIndex = 0;
