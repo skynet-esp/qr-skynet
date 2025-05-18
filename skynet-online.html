@@ -122,8 +122,16 @@ ACCESO A ARCHIVOS DESCLASIFICADOS:
     }
 
     function showFinalHTML() {
-      const typedPart = messages.join("\n") + "\n\n";
-      consoleDiv.innerHTML = typedPart + htmlLinks;
+      const typedPart = messages.join("
+") + "
+
+";
+      let container = document.createElement("div");
+      container.innerHTML = htmlLinks;
+      consoleDiv.innerHTML = typedPart;
+      setTimeout(() => {
+        consoleDiv.appendChild(container);
+      }, 500);
     }
 
     typeLine();
