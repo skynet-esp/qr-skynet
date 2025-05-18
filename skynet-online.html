@@ -30,6 +30,13 @@
       font-style: italic;
       animation: blink 0.8s step-end infinite;
     }
+    .link {
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+    .link.visible {
+      opacity: 1;
+    }
     @keyframes blink {
       50% { opacity: 0; }
     }
@@ -49,53 +56,57 @@
 
     const loadingDots = [".", "..", "...", "....", "....."];
 
-    const htmlLinks = `
-ACCESO A ARCHIVOS DESCLASIFICADOS:
+    const articles = [
+      {
+        title: "[🧠] El algoritmo de Pedro",
+        link: '<a href="https://manacorcomarcal.com/el-algoritmo-de-pedro-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/el-algoritmo-de-pedro-por-jordi-skynet/</a>'
+      },
+      {
+        title: "[🎭] Fins als ous: La isla de los figurantes",
+        link: '<a href="https://manacorcomarcal.com/fins-als-ous-la-isla-de-los-figurantes-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/fins-als-ous-la-isla-de-los-figurantes-por-jordi-skynet/</a>'
+      },
+      {
+        title: "[📚] En Miquel Galliner i el gegant del Regà",
+        link: '<a href="https://manacorcomarcal.com/en-miquel-galliner-i-el-gegant-del-rega-per-jordi-skynet/" target="_blank">https://manacorcomarcal.com/en-miquel-galliner-i-el-gegant-del-rega-per-jordi-skynet/</a>'
+      },
+      {
+        title: "[✏️] Del lápiz al prompt: el salto invisible",
+        link: '<a href="https://manacorcomarcal.com/del-lapiz-al-prompt-el-salto-invisible-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/del-lapiz-al-prompt-el-salto-invisible-por-jordi-skynet/</a>'
+      },
+      {
+        title: "[🔥] No olvido ni perdono",
+        link: '<a href="https://manacorcomarcal.com/no-olvido-ni-perdono-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/no-olvido-ni-perdono-por-jordi-skynet/</a>'
+      },
+      {
+        title: "[💸] 875 pesetas",
+        link: '<a href="https://manacorcomarcal.com/875-pesetas-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/875-pesetas-por-jordi-skynet/</a>'
+      },
+      {
+        title: "[📜] De Sócrates a Tipo: breve historia de cómo nos jodimos",
+        link: '<a href="https://manacorcomarcal.com/de-socrates-a-tipo-breve-historia-de-como-nos-jodimos-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/de-socrates-a-tipo-breve-historia-de-como-nos-jodimos-por-jordi-skynet/</a>'
+      },
+      {
+        title: "[☢️] La pendiente del Apocalipsis",
+        link: '<a href="https://manacorcomarcal.com/la-pendiente-del-apocalipsis-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/la-pendiente-del-apocalipsis-por-jordi-skynet/</a>'
+      }
+    ];
 
-[🧠] El algoritmo de Pedro  
-→ <a href="https://manacorcomarcal.com/el-algoritmo-de-pedro-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/el-algoritmo-de-pedro-por-jordi-skynet/</a>
-
-[🎭] Fins als ous: La isla de los figurantes  
-→ <a href="https://manacorcomarcal.com/fins-als-ous-la-isla-de-los-figurantes-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/fins-als-ous-la-isla-de-los-figurantes-por-jordi-skynet/</a>
-
-[📚] En Miquel Galliner i el gegant del Regà  
-→ <a href="https://manacorcomarcal.com/en-miquel-galliner-i-el-gegant-del-rega-per-jordi-skynet/" target="_blank">https://manacorcomarcal.com/en-miquel-galliner-i-el-gegant-del-rega-per-jordi-skynet/</a>
-
-[✏️] Del lápiz al prompt: el salto invisible  
-→ <a href="https://manacorcomarcal.com/del-lapiz-al-prompt-el-salto-invisible-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/del-lapiz-al-prompt-el-salto-invisible-por-jordi-skynet/</a>
-
-[🔥] No olvido ni perdono  
-→ <a href="https://manacorcomarcal.com/no-olvido-ni-perdono-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/no-olvido-ni-perdono-por-jordi-skynet/</a>
-
-[💸] 875 pesetas  
-→ <a href="https://manacorcomarcal.com/875-pesetas-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/875-pesetas-por-jordi-skynet/</a>
-
-[📜] De Sócrates a Tipo: breve historia de cómo nos jodimos  
-→ <a href="https://manacorcomarcal.com/de-socrates-a-tipo-breve-historia-de-como-nos-jodimos-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/de-socrates-a-tipo-breve-historia-de-como-nos-jodimos-por-jordi-skynet/</a>
-
-[☢️] La pendiente del Apocalipsis  
-→ <a href="https://manacorcomarcal.com/la-pendiente-del-apocalipsis-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/la-pendiente-del-apocalipsis-por-jordi-skynet/</a>
-
->> FIN DE ARCHIVOS DISPONIBLES
->> ¿SIGUES INVESTIGANDO?`;
+    const finalMessage = ">> FIN DE ARCHIVOS DISPONIBLES\n>> ¿SIGUES INVESTIGANDO?";
 
     const consoleDiv = document.getElementById("console");
     const typeSound = document.getElementById("type-sound");
 
     let lineIndex = 0;
     let charIndex = 0;
+    let articleIndex = 0;
+    let isTypingTitle = true;
 
     function typeLine() {
       if (lineIndex < messages.length) {
         const line = messages[lineIndex];
         if (charIndex <= line.length) {
           consoleDiv.innerHTML = messages.slice(0, lineIndex).join("<br>") + "<br>" + line.slice(0, charIndex);
-          if (charIndex % 2 === 0) {
-            typeSound.currentTime = 0;
-            try {
-              typeSound.play().catch(() => {}); // Manejo de error para navegadores estrictos
-            } catch (e) {}
-          }
+          playTypeSound();
           charIndex++;
           setTimeout(typeLine, 30);
         } else {
@@ -115,22 +126,61 @@ ACCESO A ARCHIVOS DESCLASIFICADOS:
         i++;
         if (i > 12) {
           clearInterval(interval);
-          showFinalHTML();
+          consoleDiv.innerHTML = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>";
+          typeArticle();
         }
       }, 400);
     }
 
-    function showFinalHTML() {
-      const typedPart = messages.join("<br>") + "<br><br>";
-      const container = document.createElement("div");
-      container.innerHTML = htmlLinks.replace(/\n/g, "<br>"); // Convertir \n a <br> para HTML
-      container.style.opacity = 0;
-      container.style.transition = "opacity 1.2s ease";
-      consoleDiv.innerHTML = typedPart;
-      consoleDiv.appendChild(container);
-      requestAnimationFrame(() => {
-        container.style.opacity = 1;
-      });
+    function typeArticle() {
+      if (articleIndex < articles.length) {
+        const article = articles[articleIndex];
+        if (isTypingTitle) {
+          if (charIndex <= article.title.length) {
+            const previousContent = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>" +
+              articles.slice(0, articleIndex).map(a => `${a.title}<br>→ ${a.link}`).join("<br><br>");
+            consoleDiv.innerHTML = previousContent + "<br>" + article.title.slice(0, charIndex);
+            playTypeSound();
+            charIndex++;
+            setTimeout(typeArticle, 30);
+          } else {
+            isTypingTitle = false;
+            charIndex = 0;
+            showLink();
+          }
+        }
+      } else {
+        showFinalMessage();
+      }
+    }
+
+    function showLink() {
+      const article = articles[articleIndex];
+      const previousContent = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>" +
+        articles.slice(0, articleIndex).map(a => `${a.title}<br>→ ${a.link}`).join("<br><br>");
+      consoleDiv.innerHTML = previousContent + "<br>" + article.title + "<br><span class='link'>→ " + article.link + "</span>";
+      const linkElement = consoleDiv.querySelector(".link:last-child");
+      setTimeout(() => {
+        linkElement.classList.add("visible");
+        articleIndex++;
+        isTypingTitle = true;
+        charIndex = 0;
+        setTimeout(typeArticle, 500);
+      }, 200);
+    }
+
+    function showFinalMessage() {
+      consoleDiv.innerHTML = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>" +
+        articles.map(a => `${a.title}<br>→ ${a.link}`).join("<br><br>") + "<br><br>" + finalMessage.replace(/\n/g, "<br>");
+    }
+
+    function playTypeSound() {
+      if (charIndex % 2 === 0) {
+        typeSound.currentTime = 0;
+        try {
+          typeSound.play().catch(() => {});
+        } catch (e) {}
+      }
     }
 
     // Iniciar la animación
