@@ -2,22 +2,36 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Skynet secreto</title>
+  <title>Skynet Matrix</title>
   <style>
     body {
       background-color: #000;
       color: #0f0;
-      font-family: monospace;
+      font-family: 'Courier New', Courier, monospace;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .contenido {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       text-align: center;
-      padding: 60px;
+      z-index: 10;
     }
-    .glow {
-      animation: glow 1.5s infinite alternate;
+
+    h1 {
+      font-size: 3em;
+      text-shadow: 0 0 10px #0f0;
+      animation: parpadeo 2s infinite alternate;
     }
-    @keyframes glow {
-      from { text-shadow: 0 0 5px #0f0; }
-      to   { text-shadow: 0 0 20px #0f0; }
+
+    p {
+      font-size: 1.2em;
+      margin-top: 20px;
     }
+
     button {
       margin-top: 40px;
       padding: 10px 30px;
@@ -27,9 +41,73 @@
       color: #000;
       border: none;
       border-radius: 8px;
+      box-shadow: 0 0 15px #0f0;
+    }
+
+    @keyframes parpadeo {
+      from { opacity: 1; }
+      to { opacity: 0.6; }
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1;
     }
   </style>
 </head>
+<body>
+
+  <div class="contenido">
+    <h1>Has cruzado el umbral</h1>
+    <p>Skynet te observa.</p>
+    <p>Esto no es una web. Es una prueba.</p>
+    <button onclick="window.location.href='https://www.youtube.com/watch?v=dQw4w9WgXcQ'">Entrar</button>
+  </div>
+
+  <canvas id="matrix"></canvas>
+
+  <script>
+    const canvas = document.getElementById("matrix");
+    const ctx = canvas.getContext("2d");
+
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+
+    const letters = "アァイィウエカキクケコサシスセソタチツテナニヌネハヒフヘホマミムメヤユヨラリルレロワヲンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    const fontSize = 14;
+    const columns = canvas.width / fontSize;
+    const drops = [];
+
+    for (let x = 0; x < columns; x++) {
+      drops[x] = 1;
+    }
+
+    function draw() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#0F0";
+      ctx.font = fontSize + "px Courier New";
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = letters.charAt(Math.floor(Math.random() * letters.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+
+        drops[i]++;
+      }
+    }
+
+    setInterval(draw, 33);
+  </script>
+</body>
+</html>
+
 <body>
   <h1 class="glow">Has cruzado el umbral</h1>
   <p>La curiosidad te ha traído hasta aquí.</p>
