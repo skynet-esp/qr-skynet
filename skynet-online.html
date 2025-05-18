@@ -126,12 +126,18 @@ ACCESO A ARCHIVOS DESCLASIFICADOS:
 ") + "
 
 ";
-      let container = document.createElement("div");
+      const container = document.createElement("div");
       container.innerHTML = htmlLinks;
+      container.style.opacity = 0;
+      container.style.transition = "opacity 1.2s ease";
       consoleDiv.innerHTML = typedPart;
       setTimeout(() => {
         consoleDiv.appendChild(container);
+        requestAnimationFrame(() => {
+          container.style.opacity = 1;
+        });
       }, 500);
+    }, 500);
     }
 
     typeLine();
