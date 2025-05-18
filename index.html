@@ -83,6 +83,16 @@
       opacity: 1;
     }
 
+    .sound-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      color: #0f0;
+      cursor: pointer;
+      font-size: 0.9em;
+      z-index: 20;
+    }
+
     @keyframes parpadeo {
       from { opacity: 1; }
       to { opacity: 0.6; }
@@ -110,6 +120,7 @@
 <body>
   <audio id="type-sound" src="https://cdn.jsdelivr.net/gh/naptha/talktype@main/examples/assets/keyboard.wav" preload="auto"></audio>
   <audio id="bg-sound" src="https://cdn.freesound.org/previews/242/242353_4372972-lq.mp3" loop preload="auto"></audio>
+  <div class="sound-toggle" id="sound-toggle">🔊 Activar sonido</div>
   <div class="contenido">
     <h1 id="titulo"></h1>
     <p id="texto1"></p>
@@ -134,7 +145,7 @@
     canvas.width = window.innerWidth;
 
     const letters = "アァイィウエカキクケコサシスセソタチツテナニヌネハヒフヘホマミムメヤユヨラリルレロワヲンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    const fontSize = 14;
+    const fontSize = 16; // Aumentado para mejor legibilidad
     const columns = canvas.width / fontSize;
     const drops = [];
     const speeds = [];
@@ -143,8 +154,8 @@
     // Inicializar columnas con posiciones, velocidades y opacidades aleatorias
     for (let x = 0; x < columns; x++) {
       drops[x] = Math.random() * canvas.height / fontSize;
-      speeds[x] = 0.5 + Math.random() * 1.5; // Velocidad entre 0.5 y 2
-      opacities[x] = 0.3 + Math.random() * 0.7; // Opacidad entre 0.3 y 1
+      speeds[x] = 0.3 + Math.random() * 0.7; // Velocidad reducida (0.3 a 1)
+      opacities[x] = 0.5 + Math.random() * 0.5; // Opacidad entre 0.5 y 1
     }
 
     function draw() {
@@ -157,27 +168,28 @@
         ctx.font = fontSize + "px Courier New";
         ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
-        // Añadir rastro con opacidad menor
-        ctx.fillStyle = `rgba(0, 255, 0, ${opacities[i] * 0.5})`;
+        // Rastros con opacidad reducida
+        ctx.fillStyle = `rgba(0, 255, 0, ${opacities[i] * 0.4})`;
         ctx.fillText(text, i * fontSize, (drops[i] - 1) * fontSize);
-        ctx.fillStyle = `rgba(0, 255, 0, ${opacities[i] * 0.2})`;
+        ctx.fillStyle = `rgba(0, 255, 0, ${opacities[i] * 0.15})`;
         ctx.fillText(text, i * fontSize, (drops[i] - 2) * fontSize);
 
         drops[i] += speeds[i];
 
         if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
           drops[i] = 0;
-          speeds[i] = 0.5 + Math.random() * 1.5;
-          opacities[i] = 0.3 + Math.random() * 0.7;
+          speeds[i] = 0.3 + Math.random() * 0.7;
+          opacities[i] = 0.5 + Math.random() * 0.5;
         }
       }
     }
 
-    setInterval(draw, 33);
+    setInterval(draw, 50); // Intervalo aumentado para movimiento más suave
 
     // Typing Effect
     const typeSound = document.getElementById("type-sound");
     const bgSound = document.getElementById("bg-sound");
+    const soundToggle = document.getElementById("sound-toggle");
     const titulo = document.getElementById("titulo");
     const texto1 = document.getElementById("texto1");
     const texto2 = document.getElementById("texto2");
@@ -191,6 +203,7 @@
 
     let messageIndex = 0;
     let charIndex = 0;
+    let soundEnabled = false;
 
     function typeText() {
       if (messageIndex < messages.length) {
@@ -198,14 +211,14 @@
         if (charIndex <= currentMessage.length) {
           const targetElement = [titulo, texto1, texto2][messageIndex];
           targetElement.innerHTML = currentMessage.slice(0, charIndex) + (charIndex < currentMessage.length ? '<span class="cursor"></span>' : '');
-          if (charIndex % 2 === 0) {
+          if (soundEnabled && charIndex % 2 === 0) {
             typeSound.currentTime = 0;
             try {
               typeSound.play().catch(() => {});
             } catch (e) {}
           }
           charIndex++;
-          setTimeout(typeText, 50);
+          setTimeout(typeText, 60); // Ligeramente más lento para mejor ritmo
         } else {
           messageIndex++;
           charIndex = 0;
@@ -214,18 +227,24 @@
       } else {
         boton.classList.add("visible");
         titulo.classList.add("glitch");
-        // Aplicar glitch con valores aleatorios
         titulo.style.setProperty('--random-x', Math.random() * 2 - 1);
         titulo.style.setProperty('--random-y', Math.random() * 2 - 1);
       }
     }
 
-    // Iniciar sonido ambiental después de interacción
-    document.addEventListener("click", () => {
-      try {
-        bgSound.play().catch(() => {});
-      } catch (e) {}
-    }, { once: true });
+    // Toggle para sonido
+    soundToggle.addEventListener("click", () => {
+      soundEnabled = !soundEnabled;
+      soundToggle.textContent = soundEnabled ? "🔇 Silenciar sonido" : "🔊 Activar sonido";
+      if (soundEnabled) {
+        try {
+          bgSound.play().catch(() => {});
+        } catch (e) {}
+      } else {
+        bgSound.pause();
+        bgSound.currentTime = 0;
+      }
+    });
 
     // Iniciar el efecto de escritura
     setTimeout(typeText, 1000);
