@@ -57,11 +57,18 @@
       border: none;
       border-radius: 8px;
       box-shadow: 0 0 15px #0f0;
-      opacity: 0;
       transition: opacity 0.8s ease;
     }
 
-    button.visible {
+    .enter-button {
+      opacity: 1;
+    }
+
+    .reveal-button {
+      opacity: 0;
+    }
+
+    .reveal-button.visible {
       opacity: 1;
     }
 
@@ -70,6 +77,11 @@
       font-size: 1em;
       color: #0f0;
       text-shadow: 0 0 5px #0f0;
+      display: none;
+    }
+
+    .contador.visible {
+      display: block;
     }
 
     .contador a {
@@ -121,14 +133,15 @@
   <audio id="intro-sound" src="assets/intro.mp3" preload="auto"></audio>
   <div class="sound-toggle" id="sound-toggle">🔊 Activar sonido</div>
   <div class="contenido">
-    <h1 id="titulo"></h1>
-    <p id="texto1"></p>
-    <p id="texto2"></p>
-    <button id="boton" onclick="window.location.href='skynet-online.html'">Revelar la verdad</button>
-    <div class="contador">
+    <button class="enter-button" id="enter-button">ENTRA</button>
+    <h1 id="titulo" style="display: none;"></h1>
+    <p id="texto1" style="display: none;"></p>
+    <p id="texto2" style="display: none;"></p>
+    <button class="reveal-button" id="boton" onclick="window.location.href='skynet-online.html'" style="display: none;">Revelar la verdad</button>
+    <div class="contador" id="contador">
       Entradas registradas:<br>
       <a href='http://www.freevisitorcounters.com' target="_blank">www.freevisitorcounters</a><br>
-      <span id="contador"></span>
+      <span id="contador-valor"></span>
       <script type='text/javascript' src='https://www.freevisitorcounters.com/auth.php?id=53ec381e536dfc95cafcd4a4d77158f6daba18a8'></script>
       <script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/1342022/t/9"></script>
     </div>
@@ -182,13 +195,15 @@
       setInterval(draw, 50);
     }
 
-    // Typing Effect
+    // Elementos y configuración
     const introSound = document.getElementById("intro-sound");
     const soundToggle = document.getElementById("sound-toggle");
+    const enterButton = document.getElementById("enter-button");
     const titulo = document.getElementById("titulo");
     const texto1 = document.getElementById("texto1");
     const texto2 = document.getElementById("texto2");
-    const boton = document.getElementById("boton");
+    const revealButton = document.getElementById("boton");
+    const contador = document.getElementById("contador");
 
     const messages = [
       "Has cruzado el umbral",
@@ -199,10 +214,54 @@
     let messageIndex = 0;
     let charIndex = 0;
     let soundEnabled = false;
+    let isActivated = false;
 
     // Depuración de carga de audio
     introSound.addEventListener("loadeddata", () => console.log("Audio intro.mp3 loaded successfully"));
     introSound.addEventListener("error", () => console.error("Failed to load intro.mp3: Check the path assets/intro.mp3"));
+
+    // Toggle para sonido
+    soundToggle.addEventListener("click", () => {
+      soundEnabled = !soundEnabled;
+      soundToggle.textContent = soundEnabled ? "🔇 Silenciar sonido" : "🔊 Activar sonido";
+      console.log(`Sound toggle clicked, soundEnabled: ${soundEnabled}`);
+      if (soundEnabled && isActivated) {
+        console.log("Attempting to play introSound on toggle");
+        try {
+          introSound.play().catch((e) => console.error("Error playing introSound on toggle:", e));
+        } catch (e) {
+          console.error("Error playing introSound on toggle:", e);
+        }
+      } else {
+        console.log("Pausing introSound on toggle");
+        introSound.pause();
+        introSound.currentTime = 0;
+      }
+    });
+
+    // Botón ENTRA
+    enterButton.addEventListener("click", () => {
+      if (!isActivated) {
+        console.log("Enter button clicked, starting animation");
+        isActivated = true;
+        soundEnabled = true;
+        localStorage.setItem("soundEnabled", soundEnabled);
+        soundToggle.textContent = "🔇 Silenciar sonido";
+        enterButton.style.display = "none";
+        titulo.style.display = "block";
+        texto1.style.display = "block";
+        texto2.style.display = "block";
+        console.log("Attempting to play introSound on button click");
+        if (soundEnabled) {
+          try {
+            introSound.play().catch((e) => console.error("Error playing introSound on button click:", e));
+          } catch (e) {
+            console.error("Error playing introSound on button click:", e);
+          }
+        }
+        typeText();
+      }
+    });
 
     function typeText() {
       try {
@@ -219,7 +278,10 @@
             setTimeout(typeText, 500);
           }
         } else {
-          boton.classList.add("visible");
+          console.log("All messages typed, showing reveal button and contador");
+          revealButton.style.display = "block";
+          revealButton.classList.add("visible");
+          contador.classList.add("visible");
           titulo.classList.add("glitch");
           titulo.style.setProperty('--random-x', Math.random() * 2 - 1);
           titulo.style.setProperty('--random-y', Math.random() * 2 - 1);
@@ -228,25 +290,6 @@
         console.error("Error en la función typeText:", e);
       }
     }
-
-    // Toggle para sonido
-    soundToggle.addEventListener("click", () => {
-      soundEnabled = !soundEnabled;
-      soundToggle.textContent = soundEnabled ? "🔇 Silenciar sonido" : "🔊 Activar sonido";
-      if (soundEnabled) {
-        try {
-          introSound.play().catch((e) => console.error("Error playing introSound:", e));
-        } catch (e) {
-          console.error("Error playing introSound:", e);
-        }
-      } else {
-        introSound.pause();
-        introSound.currentTime = 0;
-      }
-    });
-
-    // Iniciar el efecto de escritura
-    setTimeout(typeText, 1000);
   </script>
 </body>
 </html>
