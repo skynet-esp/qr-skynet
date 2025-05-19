@@ -64,7 +64,7 @@
       background-color: #ffffff;
       color: #00FF00;
     }
-    .activation-button, .restricted-button {
+    .restricted-button {
       display: block;
       margin: 20px auto;
       background-color: transparent;
@@ -78,19 +78,10 @@
       transition: all 0.3s ease;
       text-align: center;
     }
-    .restricted-button {
-      border-color: #FF0000;
-      color: #FF0000;
-    }
-    .activation-button:hover {
+    .restricted-button:hover {
       background-color: #00FF00;
       color: #000000;
       text-shadow: 0 0 5px #00FF00;
-    }
-    .restricted-button:hover {
-      background-color: #FF0000;
-      color: #000000;
-      text-shadow: 0 0 5px #FF0000;
     }
     @media (max-width: 600px) {
       body {
@@ -102,7 +93,7 @@
       .console {
         font-size: 0.8rem;
       }
-      .activation-button, .restricted-button {
+      .restricted-button {
         padding: 10px 20px;
         font-size: 0.9rem;
       }
@@ -114,11 +105,10 @@
 </head>
 <body>
   <h1>SKYNET // SECTOR ONLINE</h1>
-  <button class="activation-button" id="activation-button">INFILTRAR</button>
   <button class="restricted-button" id="restricted-button">ACCEDER A ESPACIO RESTRINGIDO</button>
   <audio id="type-sound" src="https://cdn.jsdelivr.net/gh/naptha/talktype@main/examples/assets/keyboard.wav" preload="auto"></audio>
   <audio id="intro-sound" src="assets/intro.mp3" preload="auto"></audio>
-  <div class="sound-toggle" id="sound-toggle">🔊 Activar sonido</div>
+  <div class="sound-toggle" id="sound-toggle" style="display: none;">🔊 Activar sonido</div>
   <div class="console" id="console-initial" style="display: none;"></div>
   <div class="console" id="console-articles" style="display: none;"></div>
 
@@ -173,7 +163,6 @@
     const typeSound = document.getElementById("type-sound");
     const introSound = document.getElementById("intro-sound");
     const soundToggle = document.getElementById("sound-toggle");
-    const activationButton = document.getElementById("activation-button");
     const restrictedButton = document.getElementById("restricted-button");
 
     let lineIndex = 0;
@@ -201,45 +190,44 @@
       soundEnabled = !soundEnabled;
       localStorage.setItem("soundEnabled", soundEnabled);
       soundToggle.textContent = soundEnabled ? "🔇 Silenciar sonido" : "🔊 Activar sonido";
-      if (soundEnabled) {
+      if (soundEnabled && isActivated) {
+        console.log("Attempting to play introSound on toggle");
         try {
-          introSound.play().catch((e) => console.error("Error playing introSound:", e));
+          introSound.currentTime = parseFloat(localStorage.getItem("audioTime") || 0);
+          introSound.play().catch((e) => console.error("Error playing introSound on toggle:", e));
         } catch (e) {
-          console.error("Error playing introSound:", e);
+          console.error("Error playing introSound on toggle:", e);
         }
       } else {
+        console.log("Pausing introSound on toggle");
         introSound.pause();
         localStorage.setItem("audioTime", introSound.currentTime);
       }
     });
 
-    // Función para iniciar la animación
-    function startAnimation() {
+    // Botón para iniciar la animación
+    restrictedButton.addEventListener("click", () => {
       if (!isActivated) {
+        console.log("Restricted button clicked, starting animation");
         isActivated = true;
         soundEnabled = true; // Activar sonido automáticamente
         localStorage.setItem("soundEnabled", soundEnabled);
         soundToggle.textContent = "🔇 Silenciar sonido";
-        activationButton.style.display = "none";
+        soundToggle.style.display = "block";
         restrictedButton.style.display = "none";
         consoleInitial.style.display = "block";
-        soundToggle.style.display = "block";
+        console.log("Attempting to play introSound on button click");
         if (soundEnabled) {
-          const savedTime = parseFloat(localStorage.getItem("audioTime")) || 0;
-          introSound.currentTime = savedTime;
           try {
-            introSound.play().catch((e) => console.error("Error playing introSound:", e));
+            introSound.currentTime = parseFloat(localStorage.getItem("audioTime") || 0);
+            introSound.play().catch((e) => console.error("Error playing introSound on button click:", e));
           } catch (e) {
-            console.error("Error playing introSound:", e);
+            console.error("Error playing introSound on button click:", e);
           }
         }
         typeLine();
       }
-    }
-
-    // Eventos para los botones
-    activationButton.addEventListener("click", startAnimation);
-    restrictedButton.addEventListener("click", startAnimation);
+    });
 
     function typeLine() {
       if (lineIndex < messages.length) {
@@ -318,10 +306,13 @@
 
     function playTypeSound() {
       if (soundEnabled && charIndex % 2 === 0) {
+        console.log("Attempting to play typeSound");
         typeSound.currentTime = 0;
         try {
-          typeSound.play().catch(() => {});
-        } catch (e) {}
+          typeSound.play().catch((e) => console.error("Error playing typeSound:", e));
+        } catch (e) {
+          console.error("Error playing typeSound:", e);
+        }
       }
     }
   </script>
