@@ -2,22 +2,29 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Skynet Online</title>
   <style>
     body {
       background-color: black;
       color: #00FF00;
       font-family: 'Courier New', Courier, monospace;
-      padding: 40px;
+      padding: 20px;
+      margin: 0;
     }
     h1 {
       text-align: center;
       text-shadow: 0 0 10px #0f0;
+      font-size: 1.8rem;
     }
     .console {
       white-space: pre-wrap;
-      font-size: 1.1em;
-      line-height: 1.6em;
+      font-size: 0.8rem;
+      line-height: 1.3;
+    }
+    .loading {
+      font-style: italic;
+      animation: blink 0.8s step-end infinite;
     }
     a {
       color: #00FF00;
@@ -26,16 +33,32 @@
     a:hover {
       color: #ffffff;
     }
-    .loading {
-      font-style: italic;
-      animation: blink 0.8s step-end infinite;
-    }
     .link {
       opacity: 0;
       transition: opacity 0.8s ease;
     }
     .link.visible {
       opacity: 1;
+    }
+    .sound-toggle {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      color: #0f0;
+      cursor: pointer;
+      font-size: 0.8rem;
+      z-index: 20;
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 15px;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+      .console {
+        font-size: 0.8rem;
+      }
     }
     @keyframes blink {
       50% { opacity: 0; }
@@ -45,7 +68,10 @@
 <body>
   <h1>SKYNET // SECTOR ONLINE</h1>
   <audio id="type-sound" src="https://cdn.jsdelivr.net/gh/naptha/talktype@main/examples/assets/keyboard.wav" preload="auto"></audio>
-  <div class="console" id="console"></div>
+  <audio id="intro-sound" src="assets/intro.mp3" preload="auto"></audio>
+  <div class="sound-toggle" id="sound-toggle">🔊 Activar sonido</div>
+  <div class="console" id="console-initial"></div>
+  <div class="console" id="console-articles" style="display: none;"></div>
 
   <script>
     const messages = [
@@ -93,19 +119,65 @@
 
     const finalMessage = ">> FIN DE ARCHIVOS DISPONIBLES\n>> ¿SIGUES INVESTIGANDO?";
 
-    const consoleDiv = document.getElementById("console");
+    const consoleInitial = document.getElementById("console-initial");
+    const consoleArticles = document.getElementById("console-articles");
     const typeSound = document.getElementById("type-sound");
+    const introSound = document.getElementById("intro-sound");
+    const soundToggle = document.getElementById("sound-toggle");
 
     let lineIndex = 0;
     let charIndex = 0;
     let articleIndex = 0;
     let isTypingTitle = true;
+    let soundEnabled = localStorage.getItem("soundEnabled") === "true";
+
+    // Depuración de carga de audio
+    introSound.addEventListener("loadeddata", () => console.log("Audio intro.mp3 loaded successfully"));
+    introSound.addEventListener("error", () => console.error("Failed to load intro.mp3: Check the path assets/intro.mp3"));
+    typeSound.addEventListener("loadeddata", () => console.log("Audio keyboard.wav loaded successfully"));
+    typeSound.addEventListener("error", () => console.error("Failed to load keyboard.wav"));
+
+    // Actualizar posición del audio
+    introSound.addEventListener("timeupdate", () => {
+      if (soundEnabled) {
+        localStorage.setItem("audioTime", introSound.currentTime);
+      }
+    });
+
+    // Toggle para sonido
+    soundToggle.addEventListener("click", () => {
+      soundEnabled = !soundEnabled;
+      localStorage.setItem("soundEnabled", soundEnabled);
+      soundToggle.textContent = soundEnabled ? "🔇 Silenciar sonido" : "🔊 Activar sonido";
+      if (soundEnabled) {
+        try {
+          introSound.play().catch((e) => console.error("Error playing introSound:", e));
+        } catch (e) {
+          console.error("Error playing introSound:", e);
+        }
+      } else {
+        introSound.pause();
+        localStorage.setItem("audioTime", introSound.currentTime);
+      }
+    });
+
+    // Reanudar audio si estaba activado
+    if (soundEnabled) {
+      const savedTime = parseFloat(localStorage.getItem("audioTime")) || 0;
+      introSound.currentTime = savedTime;
+      try {
+        introSound.play().catch((e) => console.error("Error playing introSound on load:", e));
+      } catch (e) {
+        console.error("Error playing introSound on load:", e);
+      }
+      soundToggle.textContent = "🔇 Silenciar sonido";
+    }
 
     function typeLine() {
       if (lineIndex < messages.length) {
         const line = messages[lineIndex];
         if (charIndex <= line.length) {
-          consoleDiv.innerHTML = messages.slice(0, lineIndex).join("<br>") + "<br>" + line.slice(0, charIndex);
+          consoleInitial.innerHTML = messages.slice(0, lineIndex).join("<br>") + "<br>" + line.slice(0, charIndex);
           playTypeSound();
           charIndex++;
           setTimeout(typeLine, 30);
@@ -122,11 +194,13 @@
     function simulateLoading() {
       let i = 0;
       const interval = setInterval(() => {
-        consoleDiv.innerHTML = messages.join("<br>") + "<br><br>CARGANDO" + loadingDots[i % loadingDots.length];
+        consoleInitial.innerHTML = messages.join("<br>") + "<br><br><span class='loading'>CARGANDO" + loadingDots[i % loadingDots.length] + "</span>";
         i++;
         if (i > 12) {
           clearInterval(interval);
-          consoleDiv.innerHTML = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>";
+          consoleInitial.style.display = "none";
+          consoleArticles.style.display = "block";
+          consoleArticles.innerHTML = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>";
           typeArticle();
         }
       }, 400);
@@ -139,7 +213,7 @@
           if (charIndex <= article.title.length) {
             const previousContent = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>" +
               articles.slice(0, articleIndex).map(a => `${a.title}<br>→ ${a.link}`).join("<br><br>");
-            consoleDiv.innerHTML = previousContent + "<br>" + article.title.slice(0, charIndex);
+            consoleArticles.innerHTML = previousContent + "<br>" + article.title.slice(0, charIndex);
             playTypeSound();
             charIndex++;
             setTimeout(typeArticle, 30);
@@ -156,35 +230,4 @@
 
     function showLink() {
       const article = articles[articleIndex];
-      const previousContent = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>" +
-        articles.slice(0, articleIndex).map(a => `${a.title}<br>→ ${a.link}`).join("<br><br>");
-      consoleDiv.innerHTML = previousContent + "<br>" + article.title + "<br><span class='link'>→ " + article.link + "</span>";
-      const linkElement = consoleDiv.querySelector(".link:last-child");
-      setTimeout(() => {
-        linkElement.classList.add("visible");
-        articleIndex++;
-        isTypingTitle = true;
-        charIndex = 0;
-        setTimeout(typeArticle, 500);
-      }, 200);
-    }
-
-    function showFinalMessage() {
-      consoleDiv.innerHTML = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>" +
-        articles.map(a => `${a.title}<br>→ ${a.link}`).join("<br><br>") + "<br><br>" + finalMessage.replace(/\n/g, "<br>");
-    }
-
-    function playTypeSound() {
-      if (charIndex % 2 === 0) {
-        typeSound.currentTime = 0;
-        try {
-          typeSound.play().catch(() => {});
-        } catch (e) {}
-      }
-    }
-
-    // Iniciar la animación
-    typeLine();
-  </script>
-</body>
-</html>
+      const previousContent = messages.join("<br
