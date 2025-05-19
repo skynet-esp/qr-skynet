@@ -106,8 +106,8 @@
 <body>
   <h1>SKYNET // SECTOR ONLINE</h1>
   <button class="restricted-button" id="restricted-button">ACCEDER A ESPACIO RESTRINGIDO</button>
-  <audio id="type-sound" src="https://cdn.jsdelivr.net/gh/naptha/talktype@main/examples/assets/key.mp3" preload="auto"></audio>
-  <audio id="intro-sound" src="assets/key.mp3" preload="auto"></audio>
+  <audio id="type-sound" src="assets/key.mp3" preload="auto"></audio>
+  <audio id="intro-sound" src="assets/intro.mp3" preload="auto"></audio>
   <div class="sound-toggle" id="sound-toggle" style="display: none;">🔊 Activar sonido</div>
   <div class="console" id="console-initial" style="display: none;"></div>
   <div class="console" id="console-articles" style="display: none;"></div>
@@ -169,19 +169,20 @@
     let charIndex = 0;
     let articleIndex = 0;
     let isTypingTitle = true;
-    let soundEnabled = localStorage.getItem("soundEnabled") === "true";
+    let soundEnabled = false; // Inicialmente desactivado
     let isActivated = false;
 
     // Depuración de carga de audio
     introSound.addEventListener("loadeddata", () => console.log("Audio intro.mp3 loaded successfully"));
     introSound.addEventListener("error", () => console.error("Failed to load intro.mp3: Check the path assets/intro.mp3"));
-    typeSound.addEventListener("loadeddata", () => console.log("Audio keyboard.wav loaded successfully"));
-    typeSound.addEventListener("error", () => console.error("Failed to load keyboard.wav"));
+    typeSound.addEventListener("loadeddata", () => console.log("Audio key.mp3 loaded successfully"));
+    typeSound.addEventListener("error", () => console.error("Failed to load key.mp3: Check the path assets/key.mp3"));
 
     // Actualizar posición del audio
     introSound.addEventListener("timeupdate", () => {
       if (soundEnabled) {
         localStorage.setItem("audioTime", introSound.currentTime);
+        console.log(`introSound time updated: ${introSound.currentTime}`);
       }
     });
 
@@ -190,6 +191,7 @@
       soundEnabled = !soundEnabled;
       localStorage.setItem("soundEnabled", soundEnabled);
       soundToggle.textContent = soundEnabled ? "🔇 Silenciar sonido" : "🔊 Activar sonido";
+      console.log(`Sound toggle clicked, soundEnabled: ${soundEnabled}`);
       if (soundEnabled && isActivated) {
         console.log("Attempting to play introSound on toggle");
         try {
@@ -306,12 +308,12 @@
 
     function playTypeSound() {
       if (soundEnabled && charIndex % 2 === 0) {
-        console.log("Attempting to play typeSound");
+        console.log("Attempting to play typeSound (key.mp3)");
         typeSound.currentTime = 0;
         try {
-          typeSound.play().catch((e) => console.error("Error playing typeSound:", e));
+          typeSound.play().catch((e) => console.error("Error playing typeSound (key.mp3):", e));
         } catch (e) {
-          console.error("Error playing typeSound:", e);
+          console.error("Error playing typeSound (key.mp3):", e);
         }
       }
     }
