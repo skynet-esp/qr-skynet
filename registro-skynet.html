@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registro Skynet</title>
   <style>
     body {
@@ -32,18 +33,24 @@
     input[type="submit"] {
       background-color: #00FF00;
       color: black;
-      padding: 10px 20px;
+      padding: 12px 25px;
       margin-top: 20px;
       border: none;
       cursor: pointer;
       font-weight: bold;
-      text-shadow: 0 0 5px #000;
+      text-transform: uppercase;
+      border-radius: 8px;
+      box-shadow: 0 0 15px #00FF00;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
     }
     .disclaimer {
       font-size: 0.9em;
       margin-top: 20px;
       color: #0f0;
       opacity: 0.7;
+      text-align: center;
     }
     a {
       color: #00FF00;
@@ -59,7 +66,10 @@
     <p>> Introduce tu correo. No para venderte nada. No para robarte el alma. (Ya la tenemos.)</p>
     <p>> Solo para enviarte, cada semana, los archivos desclasificados directamente a tu bandeja de entrada.</p>
 
-    <form action="https://formsubmit.co/jordimserra@gmail.com" method="POST">
+    <form action="https://formsubmit.co/TU_CORREO@ejemplo.com" method="POST">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="text" name="_honey" style="display:none">
+      <input type="hidden" name="_next" value="https://skynet-esp.github.io/qr-skynet/registro-confirmado.html">
       <input type="email" name="email" placeholder="tucorreo@resistencia.net" required>
       <input type="hidden" name="subject" value="Nuevo registro desde Skynet">
       <input type="submit" value="Unirme a la red">
