@@ -9,7 +9,7 @@
       background-color: black;
       color: #00FF00;
       font-family: 'Courier New', Courier, monospace;
-      padding      padding: 20px;
+      padding: 20px;
       margin: 0;
     }
     h1 {
@@ -49,7 +49,6 @@
       font-size: 0.8rem;
       z-index: 20;
     }
-    /* Estilos para el botón "ÚNETE A LA RED" */
     .join-button {
       display: inline-block;
       background-color: #00FF00;
@@ -65,7 +64,6 @@
       background-color: #ffffff;
       color: #00FF00;
     }
-    /* Estilos para el botón de activación "PARTICIPANDO" */
     .activation-button {
       display: block;
       margin: 50px auto;
@@ -84,6 +82,12 @@
       background-color: #00FF00;
       color: #000000;
       text-shadow: 0 0 5px #00FF00;
+    }
+    .error-message {
+      color: #FF0000;
+      text-align: center;
+      font-size: 0.9rem;
+      margin-top: 20px;
     }
     @media (max-width: 600px) {
       body {
@@ -107,16 +111,18 @@
 </head>
 <body>
   <h1>SKYNET // SECTOR ONLINE</h1>
-  <!-- Botón de activación -->
-  <button class="activation-button" id="activation-button">PARTICIPANDO</button>
-  <!-- Audio para el efecto de escritura (key.mp3 en assets) -->
-  <audio id="type-sound" src="assets/key.mp3" preload="auto" loop></ ہے
-
-System: audio>
+  <button class="activation-button" id="activation-button" aria-label="Iniciar conexión a Skynet">ENTRA</button>
+  <audio id="type-sound" src="assets/key.mp3" preload="auto" loop></audio>
   <audio id="intro-sound" src="assets/intro.mp3" preload="auto"></audio>
-  <div class="sound-toggle" id="sound-toggle">🔊 Activar sonido</div>
+  <div class="sound-toggle" id="sound-toggle" role="button" aria-label="Activar o desactivar sonido" style="display: none;">🔊 Activar sonido</div>
   <div class="console" id="console-initial" style="display: none;"></div>
   <div class="console" id="console-articles" style="display: none;"></div>
+  <noscript>
+    <div style="text-align: center; color: #00FF00;">
+      <h2>JavaScript es necesario para acceder a Skynet.</h2>
+      <p>Por favor, habilita JavaScript en tu navegador.</p>
+    </div>
+  </noscript>
 
   <script>
     const messages = [
@@ -130,31 +136,31 @@ System: audio>
     const articles = [
       {
         title: "[🧠] El algoritmo de Pedro",
-        link: '<a href="https://manacor-gegant-del-rega-per-jordi-skynet/" target="_blank">https://manacorcomarcal.com/en-miquel-galliner-i-el-gegant-del-rega-per-jordi-skynet/</a>'
+        link: '<a href="https://manacorcomarcal.com/en-miquel-galliner-i-el-gegant-del-rega-per-jordi-skynet/" target="_blank" rel="noopener" title="Leer artículo en Manacor Comarcal">https://manacorcomarcal.com/en-miquel-galliner-i-el-gegant-del-rega-per-jordi-skynet/</a>'
       },
       {
         title: "[✏️] Del lápiz al prompt: el salto invisible",
-        link: '<a href="https://manacorcomarcal.com/del-lapiz-al-prompt-el-salto-invisible-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/del-lapiz-al-prompt-el-salto-invisible-por-jordi-skynet/</a>'
+        link: '<a href="https://manacorcomarcal.com/del-lapiz-al-prompt-el-salto-invisible-por-jordi-skynet/" target="_blank" rel="noopener" title="Leer artículo en Manacor Comarcal">https://manacorcomarcal.com/del-lapiz-al-prompt-el-salto-invisible-por-jordi-skynet/</a>'
       },
       {
         title: "[🔥] No olvido ni perdono",
-        link: '<a href="https://manacorcomarcal.com/no-olvido-ni-perdono-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/no-olvido-ni-perdono-por-jordi-skynet/</a>'
+        link: '<a href="https://manacorcomarcal.com/no-olvido-ni-perdono-por-jordi-skynet/" target="_blank" rel="noopener" title="Leer artículo en Manacor Comarcal">https://manacorcomarcal.com/no-olvido-ni-perdono-por-jordi-skynet/</a>'
       },
       {
         title: "[💸] 875 pesetas",
-        link: '<a href="https://manacorcomarcal.com/875-pesetas-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/875-pesetas-por-jordi-skynet/</a>'
+        link: '<a href="https://manacorcomarcal.com/875-pesetas-por-jordi-skynet/" target="_blank" rel="noopener" title="Leer artículo en Manacor Comarcal">https://manacorcomarcal.com/875-pesetas-por-jordi-skynet/</a>'
       },
       {
         title: "[📜] De Sócrates a Tipo: breve historia de cómo nos jodimos",
-        link: '<a href="https://manacorcomarcal.com/de-socrates-a-tipo-breve-historia-de-como-nos-jodimos-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/de-socrates-a-tipo-breve-historia-de-como-nos-jodimos-por-jordi-skynet/</a>'
+        link: '<a href="https://manacorcomarcal.com/de-socrates-a-tipo-breve-historia-de-como-nos-jodimos-por-jordi-skynet/" target="_blank" rel="noopener" title="Leer artículo en Manacor Comarcal">https://manacorcomarcal.com/de-socrates-a-tipo-breve-historia-de-como-nos-jodimos-por-jordi-skynet/</a>'
       },
       {
         title: "[☢️] La pendiente del Apocalipsis",
-        link: '<a href="https://manacorcomarcal.com/la-pendiente-del-apocalipsis-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/la-pendiente-del-apocalipsis-por-jordi-skynet/</a>'
+        link: '<a href="https://manacorcomarcal.com/la-pendiente-del-apocalipsis-por-jordi-skynet/" target="_blank" rel="noopener" title="Leer artículo en Manacor Comarcal">https://manacorcomarcal.com/la-pendiente-del-apocalipsis-por-jordi-skynet/</a>'
       }
     ];
 
-    const finalMessage = ">> FIN DE ARCHIVOS DISPONIBLES\n>> ¿SIGUES INVESTIGANDO?\n<div style=\"text-align:center;\"><a class=\"join-button\" href=\"registro-skynet.html\">ÚNETE A LA RED</a></div>";
+    const finalMessage = ">> FIN DE ARCHIVOS DISPONIBLES\n>> ¿SIGUES INVESTIGANDO?\n<div style=\"text-align:center;\"><a class=\"join-button\" href=\"registro-skynet.html\" aria-label=\"Unirse a la red Skynet\">ÚNETE A LA RED</a></div>";
 
     const consoleInitial = document.getElementById("console-initial");
     const consoleArticles = document.getElementById("console-articles");
@@ -167,54 +173,56 @@ System: audio>
     let charIndex = 0;
     let articleIndex = 0;
     let isTypingTitle = true;
-    let soundEnabled = localStorage.getItem("soundEnabled") === "true";
-    let isActivated = false; // Controla si se ha presionado el botón
+    let soundEnabled = sessionStorage.getItem("soundEnabled") === "true";
+    let isActivated = false;
 
-    // Depuración de carga de audio
-    introSound.addEventListener("loadeddata", () => console.log("Audio intro.mp3 loaded successfully"));
-    introSound.addEventListener("error", () => console.error("Failed to load intro.mp3: Check the path assets/intro.mp3"));
-    typeSound.addEventListener("loadeddata", () => console.log("Audio key.mp3 loaded successfully"));
-    typeSound.addEventListener("error", () => console.error("Failed to load key.mp3: Check the path assets/key.mp3"));
+    // Inicializar toggle de sonido
+    soundToggle.textContent = soundEnabled ? "🔇 Silenciar sonido" : "🔊 Activar sonido";
 
-    // Actualizar posición del audio
+    // Manejo de errores de audio
+    introSound.addEventListener("error", () => {
+      console.error("Failed to load intro.mp3");
+      soundToggle.textContent = "🔇 Error en audio";
+      soundToggle.style.pointerEvents = "none";
+      showErrorMessage("Error al cargar el audio de fondo.");
+    });
+    typeSound.addEventListener("error", () => {
+      console.error("Failed to load key.mp3");
+      showErrorMessage("Error al cargar el sonido de escritura.");
+    });
+
+    // Persistencia de posición de audio
     introSound.addEventListener("timeupdate", () => {
       if (soundEnabled) {
-        localStorage.setItem("audioTime", introSound.currentTime);
+        sessionStorage.setItem("audioTime", introSound.currentTime);
       }
     });
 
-    // Toggle para sonido
+    // Toggle de sonido
     soundToggle.addEventListener("click", () => {
       soundEnabled = !soundEnabled;
-      localStorage.setItem("soundEnabled", soundEnabled);
+      sessionStorage.setItem("soundEnabled", soundEnabled);
       soundToggle.textContent = soundEnabled ? "🔇 Silenciar sonido" : "🔊 Activar sonido";
       if (soundEnabled && isActivated) {
-        try {
-          introSound.play().catch((e) => console.error("Error playing introSound:", e));
-        } catch (e) {
-          console.error("Error playing introSound:", e);
-        }
+        introSound.currentTime = parseFloat(sessionStorage.getItem("audioTime") || 0);
+        introSound.play().catch(e => console.error("Error playing introSound:", e));
       } else {
         introSound.pause();
-        localStorage.setItem("audioTime", introSound.currentTime);
       }
     });
 
-    // Evento para el botón de activación
+    // Botón de activación
     activationButton.addEventListener("click", () => {
       if (!isActivated) {
         isActivated = true;
-        activationButton.style.display = "none"; // Ocultar botón
-        consoleInitial.style.display = "block"; // Mostrar consola inicial
-        soundToggle.style.display = "block"; // Mostrar toggle de sonido
+        activationButton.style.display = "none";
+        consoleInitial.style.display = "block";
+        soundToggle.style.display = "block";
         if (soundEnabled) {
-          try {
-            introSound.play().catch((e) => console.error("Error playing introSound on activation:", e));
-          } catch (e) {
-            console.error("Error playing introSound on activation:", e);
-          }
+          introSound.currentTime = parseFloat(sessionStorage.getItem("audioTime") || 0);
+          introSound.play().catch(e => console.error("Error playing introSound:", e));
         }
-        typeLine(); // Iniciar animación
+        typeLine();
       }
     });
 
@@ -225,7 +233,7 @@ System: audio>
           consoleInitial.innerHTML = messages.slice(0, lineIndex).join("<br>") + "<br>" + line.slice(0, charIndex);
           playTypeSound();
           charIndex++;
-          setTimeout(typeLine, 30);
+          requestAnimationFrame(typeLine);
         } else {
           lineIndex++;
           charIndex = 0;
@@ -258,10 +266,11 @@ System: audio>
           if (charIndex <= article.title.length) {
             const previousContent = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>" +
               articles.slice(0, articleIndex).map(a => `${a.title}<br>→ ${a.link}`).join("<br><br>");
-            consoleArticles.innerHTML = previousContent + "<br>" + article.title.slice(0, charIndex);
+            consoleArticles.innerHTML = previousContent + "<br>" + article.title.slice(0, charIndex) +
+              `<br><span style="color: #00FF00;">(Archivo ${articleIndex + 1} de ${articles.length})</span>`;
             playTypeSound();
             charIndex++;
-            setTimeout(typeArticle, 30);
+            requestAnimationFrame(typeArticle);
           } else {
             isTypingTitle = false;
             charIndex = 0;
@@ -277,7 +286,8 @@ System: audio>
       const article = articles[articleIndex];
       const previousContent = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>" +
         articles.slice(0, articleIndex).map(a => `${a.title}<br>→ ${a.link}`).join("<br><br>");
-      consoleArticles.innerHTML = previousContent + "<br>" + article.title + "<br><span class='link'>→ " + article.link + "</span>";
+      consoleArticles.innerHTML = previousContent + "<br>" + article.title + "<br><span class='link'>→ " + article.link + "</span>" +
+        `<br><span style="color: #00FF00;">(Archivo ${articleIndex + 1} de ${articles.length})</span>`;
       const linkElement = consoleArticles.querySelector(".link:last-child");
       setTimeout(() => {
         linkElement.classList.add("visible");
@@ -291,15 +301,21 @@ System: audio>
     function showFinalMessage() {
       consoleArticles.innerHTML = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>" +
         articles.map(a => `${a.title}<br>→ ${a.link}`).join("<br><br>") + "<br><br>" + finalMessage.replace(/\n/g, "<br>");
-      typeSound.pause(); // Detener key.mp3 al finalizar
+      typeSound.pause();
     }
 
     function playTypeSound() {
       if (soundEnabled && isActivated) {
-        try {
-          typeSound.play().catch(() => {});
-        } catch (e) {}
+        typeSound.play().catch(() => {});
       }
+    }
+
+    function showErrorMessage(message) {
+      const errorDiv = document.createElement("div");
+      errorDiv.className = "error-message";
+      errorDiv.textContent = message;
+      document.body.appendChild(errorDiv);
+      setTimeout(() => errorDiv.remove(), 5000);
     }
   </script>
 </body>
