@@ -49,6 +49,7 @@
       font-size: 0.8rem;
       z-index: 20;
     }
+    /* Estilos para el botón "ÚNETE A LA RED" */
     .join-button {
       display: inline-block;
       background-color: #00FF00;
@@ -64,31 +65,6 @@
       background-color: #ffffff;
       color: #00FF00;
     }
-    .activation-button {
-      display: block;
-      margin: 50px auto;
-      background-color: transparent;
-      border: 2px solid #00FF00;
-      color: #00FF00;
-      padding: 12px 24px;
-      font-size: 1rem;
-      font-family: 'Courier New', Courier, monospace;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-align: center;
-    }
-    .activation-button:hover {
-      background-color: #00FF00;
-      color: #000000;
-      text-shadow: 0 0 5px #00FF00;
-    }
-    .error-message, .debug-message {
-      color: #FF0000;
-      text-align: center;
-      font-size: 0.9rem;
-      margin-top: 20px;
-    }
     @media (max-width: 600px) {
       body {
         padding: 15px;
@@ -99,10 +75,6 @@
       .console {
         font-size: 0.8rem;
       }
-      .activation-button {
-        padding: 10px 20px;
-        font-size: 0.9rem;
-      }
     }
     @keyframes blink {
       50% { opacity: 0; }
@@ -111,20 +83,11 @@
 </head>
 <body>
   <h1>SKYNET // SECTOR ONLINE</h1>
-  <button class="activation-button" id="activation-button" aria-label="Iniciar conexión a Skynet">ENTRA</button>
-  <!-- Audio comentado para pruebas -->
-  <!-- <audio id="type-sound" src="assets/key.mp3" preload="auto"></audio> -->
-  <!-- <audio id="intro-sound" src="assets/intro.mp3" preload="auto"></audio> -->
-  <div class="sound-toggle" id="sound-toggle" role="button" aria-label="Activar o desactivar sonido" style="display: none;">🔊 Activar sonido</div>
-  <div class="console" id="console-initial" style="display: none;"></div>
+  <audio id="type-sound" src="https://cdn.jsdelivr.net/gh/naptha/talktype@main/examples/assets/keyboard.wav" preload="auto"></audio>
+  <audio id="intro-sound" src="assets/intro.mp3" preload="auto"></audio>
+  <div class="sound-toggle" id="sound-toggle">🔊 Activar sonido</div>
+  <div class="console" id="console-initial"></div>
   <div class="console" id="console-articles" style="display: none;"></div>
-  <div class="debug-message" id="debug-message"></div>
-  <noscript>
-    <div style="text-align: center; color: #00FF00;">
-      <h2>JavaScript es necesario para acceder a Skynet.</h2>
-      <p>Por favor, habilita JavaScript en tu navegador.</p>
-    </div>
-  </noscript>
 
   <script>
     const messages = [
@@ -138,113 +101,108 @@
     const articles = [
       {
         title: "[🧠] El algoritmo de Pedro",
-        link: '<a href="https://manacorcomarcal.com/en-miquel-galliner-i-el-gegant-del-rega-per-jordi-skynet/" target="_blank" rel="noopener" title="Leer artículo en Manacor Comarcal">https://manacorcomarcal.com/en-miquel-galliner-i-el-gegant-del-rega-per-jordi-skynet/</a>'
+        link: '<a href="https://manacorcomarcal.com/el-algoritmo-de-pedro-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/el-algoritmo-de-pedro-por-jordi-skynet/</a>'
+      },
+      {
+        title: "[🎭] Fins als ous: La isla de los figurantes",
+        link: '<a href="https://manacorcomarcal.com/fins-als-ous-la-isla-de-los-figurantes-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/fins-als-ous-la-isla-de-los-figurantes-por-jordi-skynet/</a>'
+      },
+      {
+        title: "[📚] En Miquel Galliner i el gegant del REGA",
+        link: '<a href="https://manacorcomarcal.com/en-miquel-galliner-i-el-gegant-del-rega-per-jordi-skynet/" target="_blank">https://manacorcomarcal.com/en-miquel-galliner-i-el-gegant-del-rega-per-jordi-skynet/</a>'
       },
       {
         title: "[✏️] Del lápiz al prompt: el salto invisible",
-        link: '<a href="https://manacorcomarcal.com/del-lapiz-al-prompt-el-salto-invisible-por-jordi-skynet/" target="_blank" rel="noopener" title="Leer artículo en Manacor Comarcal">https://manacorcomarcal.com/del-lapiz-al-prompt-el-salto-invisible-por-jordi-skynet/</a>'
+        link: '<a href="https://manacorcomarcal.com/del-lapiz-al-prompt-el-salto-invisible-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/del-lapiz-al-prompt-el-salto-invisible-por-jordi-skynet/</a>'
       },
       {
         title: "[🔥] No olvido ni perdono",
-        link: '<a href="https://manacorcomarcal.com/no-olvido-ni-perdono-por-jordi-skynet/" target="_blank" rel="noopener" title="Leer artículo en Manacor Comarcal">https://manacorcomarcal.com/no-olvido-ni-perdono-por-jordi-skynet/</a>'
+        link: '<a href="https://manacorcomarcal.com/no-olvido-ni-perdono-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/no-olvido-ni-perdono-por-jordi-skynet/</a>'
       },
       {
         title: "[💸] 875 pesetas",
-        link: '<a href="https://manacorcomarcal.com/875-pesetas-por-jordi-skynet/" target="_blank" rel="noopener" title="Leer artículo en Manacor Comarcal">https://manacorcomarcal.com/875-pesetas-por-jordi-skynet/</a>'
+        link: '<a href="https://manacorcomarcal.com/875-pesetas-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/875-pesetas-por-jordi-skynet/</a>'
       },
       {
         title: "[📜] De Sócrates a Tipo: breve historia de cómo nos jodimos",
-        link: '<a href="https://manacorcomarcal.com/de-socrates-a-tipo-breve-historia-de-como-nos-jodimos-por-jordi-skynet/" target="_blank" rel="noopener" title="Leer artículo en Manacor Comarcal">https://manacorcomarcal.com/de-socrates-a-tipo-breve-historia-de-como-nos-jodimos-por-jordi-skynet/</a>'
+        link: '<a href="https://manacorcomarcal.com/de-socrates-a-tipo-breve-historia-de-como-nos-jodimos-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/de-socrates-a-tipo-breve-historia-de-como-nos-jodimos-por-jordi-skynet/</a>'
       },
       {
         title: "[☢️] La pendiente del Apocalipsis",
-        link: '<a href="https://manacorcomarcal.com/la-pendiente-del-apocalipsis-por-jordi-skynet/" target="_blank" rel="noopener" title="Leer artículo en Manacor Comarcal">https://manacorcomarcal.com/la-pendiente-del-apocalipsis-por-jordi-skynet/</a>'
+        link: '<a href="https://manacorcomarcal.com/la-pendiente-del-apocalipsis-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/la-pendiente-del-apocalipsis-por-jordi-skynet/</a>'
       }
     ];
-
-    const finalMessage = ">> FIN DE ARCHIVOS DISPONIBLES\n>> ¿SIGUES INVESTIGANDO?\n<div style=\"text-align:center;\"><a class=\"join-button\" href=\"registro-skynet.html\" aria-label=\"Unirse a la red Skynet\">ÚNETE A LA RED</a></div>";
+    
+    const finalMessage = ">> FIN DE ARCHIVOS DISPONIBLES\n>> ¿SIGUES INVESTIGANDO?\n<div style=\"text-align:center;\"><a class=\"join-button\" href=\"registro-skynet.html\">ÚNETE A LA RED</a></div>";
 
     const consoleInitial = document.getElementById("console-initial");
     const consoleArticles = document.getElementById("console-articles");
-    const typeSound = document.getElementById("type-sound") || { play: () => {}, pause: () => {}, currentTime: 0 }; // Fallback
-    const introSound = document.getElementById("intro-sound") || { play: () => {}, pause: () => {}, currentTime: 0 };
+    const typeSound = document.getElementById("type-sound");
+    const introSound = document.getElementById("intro-sound");
     const soundToggle = document.getElementById("sound-toggle");
-    const activationButton = document.getElementById("activation-button");
-    const debugMessage = document.getElementById("debug-message");
 
     let lineIndex = 0;
+    let charIndex = 0;
     let articleIndex = 0;
-    let soundEnabled = false;
-    let isActivated = false;
+    let isTypingTitle = true;
+    let soundEnabled = localStorage.getItem("soundEnabled") === "true";
 
-    // Función para mostrar mensajes de depuración en pantalla
-    function showDebugMessage(message) {
-      debugMessage.textContent = `DEBUG: ${message}`;
-      console.log(`DEBUG: ${message}`);
-      setTimeout(() => { debugMessage.textContent = ""; }, 3000);
-    }
+    // Depuración de carga de audio
+    introSound.addEventListener("loadeddata", () => console.log("Audio intro.mp3 loaded successfully"));
+    introSound.addEventListener("error", () => console.error("Failed to load intro.mp3: Check the path assets/intro.mp3"));
+    typeSound.addEventListener("loadeddata", () => console.log("Audio keyboard.wav loaded successfully"));
+    typeSound.addEventListener("error", () => console.error("Failed to load keyboard.wav"));
 
-    // Función genérica para escribir texto carácter por carácter
-    function typeText(text, container, callback) {
-      let charIndex = 0;
-      showDebugMessage(`Typing: ${text.slice(0, 20)}...`);
-      function typeNextChar() {
-        if (charIndex < text.length) {
-          container.innerHTML = text.slice(0, charIndex);
-          playTypeSound();
-          charIndex++;
-          setTimeout(typeNextChar, 30);
-        } else {
-          playTypeSound();
-          callback();
-        }
+    // Actualizar posición del audio
+    introSound.addEventListener("timeupdate", () => {
+      if (soundEnabled) {
+        localStorage.setItem("audioTime", introSound.currentTime);
       }
-      typeNextChar();
-    }
+    });
 
-    // Toggle de sonido
+    // Toggle para sonido
     soundToggle.addEventListener("click", () => {
       soundEnabled = !soundEnabled;
-      sessionStorage.setItem("soundEnabled", soundEnabled);
+      localStorage.setItem("soundEnabled", soundEnabled);
       soundToggle.textContent = soundEnabled ? "🔇 Silenciar sonido" : "🔊 Activar sonido";
-      if (soundEnabled && isActivated) {
-        introSound.currentTime = parseFloat(sessionStorage.getItem("audioTime") || 0);
-        introSound.play().catch(e => console.error("Error playing introSound:", e));
+      if (soundEnabled) {
+        try {
+          introSound.play().catch((e) => console.error("Error playing introSound:", e));
+        } catch (e) {
+          console.error("Error playing introSound:", e);
+        }
       } else {
         introSound.pause();
-        typeSound.pause();
+        localStorage.setItem("audioTime", introSound.currentTime);
       }
     });
 
-    // Botón de activación
-    activationButton.addEventListener("click", () => {
-      if (!isActivated) {
-        isActivated = true;
-        soundEnabled = true;
-        sessionStorage.setItem("soundEnabled", soundEnabled);
-        soundToggle.textContent = "🔇 Silenciar sonido";
-        activationButton.style.display = "none";
-        consoleInitial.style.display = "block";
-        soundToggle.style.display = "block";
-        if (soundEnabled) {
-          introSound.currentTime = parseFloat(sessionStorage.getItem("audioTime") || 0);
-          introSound.play().catch(e => showDebugMessage("Error al reproducir introSound"));
-        }
-        showDebugMessage("Starting initial messages");
-        typeInitialMessages();
+    // Reanudar audio si estaba activado
+    if (soundEnabled) {
+      const savedTime = parseFloat(localStorage.getItem("audioTime")) || 0;
+      introSound.currentTime = savedTime;
+      try {
+        introSound.play().catch((e) => console.error("Error playing introSound on load:", e));
+      } catch (e) {
+        console.error("Error playing introSound on load:", e);
       }
-    });
+      soundToggle.textContent = "🔇 Silenciar sonido";
+    }
 
-    function typeInitialMessages() {
+    function typeLine() {
       if (lineIndex < messages.length) {
-        const previousContent = messages.slice(0, lineIndex).join("<br>");
-        typeText(messages[lineIndex], consoleInitial, () => {
-          consoleInitial.innerHTML = previousContent + (previousContent ? "<br>" : "") + messages[lineIndex];
+        const line = messages[lineIndex];
+        if (charIndex <= line.length) {
+          consoleInitial.innerHTML = messages.slice(0, lineIndex).join("<br>") + "<br>" + line.slice(0, charIndex);
+          playTypeSound();
+          charIndex++;
+          setTimeout(typeLine, 30);
+        } else {
           lineIndex++;
-          setTimeout(typeInitialMessages, 500);
-        });
+          charIndex = 0;
+          setTimeout(typeLine, 500);
+        }
       } else {
-        showDebugMessage("Starting loading simulation");
         simulateLoading();
       }
     }
@@ -259,50 +217,64 @@
           consoleInitial.style.display = "none";
           consoleArticles.style.display = "block";
           consoleArticles.innerHTML = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>";
-          showDebugMessage("Starting articles");
-          typeArticles();
+          typeArticle();
         }
       }, 400);
     }
 
-    function typeArticles() {
+    function typeArticle() {
       if (articleIndex < articles.length) {
         const article = articles[articleIndex];
-        const previousContent = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>" +
-          articles.slice(0, articleIndex).map(a => `${a.title}<br>→ ${a.link}`).join("<br><br>");
-        consoleArticles.innerHTML = previousContent + (previousContent ? "<br>" : "");
-        showDebugMessage(`Typing article ${articleIndex + 1}: ${article.title}`);
-        typeText(article.title + `<br><span style="color: #00FF00;">(Archivo ${articleIndex + 1} de ${articles.length})</span>`, 
-                 consoleArticles, 
-                 () => {
-                   showDebugMessage(`Finished typing article ${articleIndex + 1}, showing link`);
-                   consoleArticles.innerHTML = previousContent + (previousContent ? "<br>" : "") + 
-                     article.title + `<br><span class='link'>→ ${article.link}</span>` + 
-                     `<br><span style="color: #00FF00;">(Archivo ${articleIndex + 1} de ${articles.length})</span>`;
-                   const linkElement = consoleArticles.querySelector(".link:last-child");
-                   linkElement.classList.add("visible");
-                   articleIndex++;
-                   setTimeout(typeArticles, 500);
-                 });
+        if (isTypingTitle) {
+          if (charIndex <= article.title.length) {
+            const previousContent = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>" +
+              articles.slice(0, articleIndex).map(a => `${a.title}<br>→ ${a.link}`).join("<br><br>");
+            consoleArticles.innerHTML = previousContent + "<br>" + article.title.slice(0, charIndex);
+            playTypeSound();
+            charIndex++;
+            setTimeout(typeArticle, 30);
+          } else {
+            isTypingTitle = false;
+            charIndex = 0;
+            showLink();
+          }
+        }
       } else {
-        showDebugMessage("All articles displayed, showing final message");
         showFinalMessage();
       }
+    }
+
+    function showLink() {
+      const article = articles[articleIndex];
+      const previousContent = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>" +
+        articles.slice(0, articleIndex).map(a => `${a.title}<br>→ ${a.link}`).join("<br><br>");
+      consoleArticles.innerHTML = previousContent + "<br>" + article.title + "<br><span class='link'>→ " + article.link + "</span>";
+      const linkElement = consoleArticles.querySelector(".link:last-child");
+      setTimeout(() => {
+        linkElement.classList.add("visible");
+        articleIndex++;
+        isTypingTitle = true;
+        charIndex = 0;
+        setTimeout(typeArticle, 500);
+      }, 200);
     }
 
     function showFinalMessage() {
       consoleArticles.innerHTML = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>" +
         articles.map(a => `${a.title}<br>→ ${a.link}`).join("<br><br>") + "<br><br>" + finalMessage.replace(/\n/g, "<br>");
-      typeSound.pause();
-      introSound.pause();
     }
 
     function playTypeSound() {
-      if (soundEnabled && isActivated) {
+      if (charIndex % 2 === 0) {
         typeSound.currentTime = 0;
-        typeSound.play().catch(() => {});
+        try {
+          typeSound.play().catch(() => {});
+        } catch (e) {}
       }
     }
+
+    // Iniciar la animación
+    typeLine();
   </script>
 </body>
 </html>
