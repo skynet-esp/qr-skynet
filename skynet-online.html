@@ -112,7 +112,7 @@
 <body>
   <h1>SKYNET // SECTOR ONLINE</h1>
   <button class="activation-button" id="activation-button" aria-label="Iniciar conexión a Skynet">ENTRA</button>
-  <audio id="type-sound" src="assets/key.mp3" preload="auto" loop></audio>
+  <audio id="type-sound" src="assets/key.mp3" preload="auto"></audio>
   <audio id="intro-sound" src="assets/intro.mp3" preload="auto"></audio>
   <div class="sound-toggle" id="sound-toggle" role="button" aria-label="Activar o desactivar sonido" style="display: none;">🔊 Activar sonido</div>
   <div class="console" id="console-initial" style="display: none;"></div>
@@ -173,7 +173,7 @@
     let charIndex = 0;
     let articleIndex = 0;
     let isTypingTitle = true;
-    let soundEnabled = sessionStorage.getItem("soundEnabled") === "true";
+    let soundEnabled = false; // Inicialmente desactivado
     let isActivated = false;
 
     // Inicializar toggle de sonido
@@ -208,6 +208,7 @@
         introSound.play().catch(e => console.error("Error playing introSound:", e));
       } else {
         introSound.pause();
+        typeSound.pause();
       }
     });
 
@@ -215,6 +216,9 @@
     activationButton.addEventListener("click", () => {
       if (!isActivated) {
         isActivated = true;
+        soundEnabled = true; // Activar sonido automáticamente
+        sessionStorage.setItem("soundEnabled", soundEnabled);
+        soundToggle.textContent = "🔇 Silenciar sonido";
         activationButton.style.display = "none";
         consoleInitial.style.display = "block";
         soundToggle.style.display = "block";
@@ -263,7 +267,7 @@
       if (articleIndex < articles.length) {
         const article = articles[articleIndex];
         if (isTypingTitle) {
-          if (charIndex <= article.title.length) {
+          if (charIndex < article.title.length) { // Cambiado <= a < para evitar desbordamiento
             const previousContent = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>" +
               articles.slice(0, articleIndex).map(a => `${a.title}<br>→ ${a.link}`).join("<br><br>");
             consoleArticles.innerHTML = previousContent + "<br>" + article.title.slice(0, charIndex) +
@@ -274,6 +278,7 @@
           } else {
             isTypingTitle = false;
             charIndex = 0;
+            typeSound.pause(); // Detener sonido al terminar título
             showLink();
           }
         }
@@ -302,10 +307,12 @@
       consoleArticles.innerHTML = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>" +
         articles.map(a => `${a.title}<br>→ ${a.link}`).join("<br><br>") + "<br><br>" + finalMessage.replace(/\n/g, "<br>");
       typeSound.pause();
+      introSound.pause();
     }
 
     function playTypeSound() {
       if (soundEnabled && isActivated) {
+        typeSound.currentTime = 0; // Reiniciar para simular pulsación
         typeSound.play().catch(() => {});
       }
     }
