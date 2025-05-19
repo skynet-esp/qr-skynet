@@ -83,7 +83,7 @@
       color: #000000;
       text-shadow: 0 0 5px #00FF00;
     }
-    .error-message {
+    .error-message, .debug-message {
       color: #FF0000;
       text-align: center;
       font-size: 0.9rem;
@@ -112,11 +112,13 @@
 <body>
   <h1>SKYNET // SECTOR ONLINE</h1>
   <button class="activation-button" id="activation-button" aria-label="Iniciar conexión a Skynet">ENTRA</button>
-  <audio id="type-sound" src="assets/key.mp3" preload="auto"></audio>
-  <audio id="intro-sound" src="assets/intro.mp3" preload="auto"></audio>
+  <!-- Audio comentado para pruebas -->
+  <!-- <audio id="type-sound" src="assets/key.mp3" preload="auto"></audio> -->
+  <!-- <audio id="intro-sound" src="assets/intro.mp3" preload="auto"></audio> -->
   <div class="sound-toggle" id="sound-toggle" role="button" aria-label="Activar o desactivar sonido" style="display: none;">🔊 Activar sonido</div>
   <div class="console" id="console-initial" style="display: none;"></div>
   <div class="console" id="console-articles" style="display: none;"></div>
+  <div class="debug-message" id="debug-message"></div>
   <noscript>
     <div style="text-align: center; color: #00FF00;">
       <h2>JavaScript es necesario para acceder a Skynet.</h2>
@@ -164,39 +166,41 @@
 
     const consoleInitial = document.getElementById("console-initial");
     const consoleArticles = document.getElementById("console-articles");
-    const typeSound = document.getElementById("type-sound");
-    const introSound = document.getElementById("intro-sound");
+    const typeSound = document.getElementById("type-sound") || { play: () => {}, pause: () => {}, currentTime: 0 }; // Fallback
+    const introSound = document.getElementById("intro-sound") || { play: () => {}, pause: () => {}, currentTime: 0 };
     const soundToggle = document.getElementById("sound-toggle");
     const activationButton = document.getElementById("activation-button");
+    const debugMessage = document.getElementById("debug-message");
 
     let lineIndex = 0;
-    let charIndex = 0;
     let articleIndex = 0;
-    let isTypingTitle = true;
     let soundEnabled = false;
     let isActivated = false;
 
-    // Inicializar toggle de sonido
-    soundToggle.textContent = soundEnabled ? "🔇 Silenciar sonido" : "🔊 Activar sonido";
+    // Función para mostrar mensajes de depuración en pantalla
+    function showDebugMessage(message) {
+      debugMessage.textContent = `DEBUG: ${message}`;
+      console.log(`DEBUG: ${message}`);
+      setTimeout(() => { debugMessage.textContent = ""; }, 3000);
+    }
 
-    // Manejo de errores de audio
-    introSound.addEventListener("error", () => {
-      console.error("Failed to load intro.mp3");
-      soundToggle.textContent = "🔇 Error en audio";
-      soundToggle.style.pointerEvents = "none";
-      showErrorMessage("Error al cargar el audio de fondo.");
-    });
-    typeSound.addEventListener("error", () => {
-      console.error("Failed to load key.mp3");
-      showErrorMessage("Error al cargar el sonido de escritura.");
-    });
-
-    // Persistencia de posición de audio
-    introSound.addEventListener("timeupdate", () => {
-      if (soundEnabled) {
-        sessionStorage.setItem("audioTime", introSound.currentTime);
+    // Función genérica para escribir texto carácter por carácter
+    function typeText(text, container, callback) {
+      let charIndex = 0;
+      showDebugMessage(`Typing: ${text.slice(0, 20)}...`);
+      function typeNextChar() {
+        if (charIndex < text.length) {
+          container.innerHTML = text.slice(0, charIndex);
+          playTypeSound();
+          charIndex++;
+          setTimeout(typeNextChar, 30);
+        } else {
+          playTypeSound();
+          callback();
+        }
       }
-    });
+      typeNextChar();
+    }
 
     // Toggle de sonido
     soundToggle.addEventListener("click", () => {
@@ -224,26 +228,23 @@
         soundToggle.style.display = "block";
         if (soundEnabled) {
           introSound.currentTime = parseFloat(sessionStorage.getItem("audioTime") || 0);
-          introSound.play().catch(e => console.error("Error playing introSound:", e));
+          introSound.play().catch(e => showDebugMessage("Error al reproducir introSound"));
         }
-        typeLine();
+        showDebugMessage("Starting initial messages");
+        typeInitialMessages();
       }
     });
 
-    function typeLine() {
+    function typeInitialMessages() {
       if (lineIndex < messages.length) {
-        const line = messages[lineIndex];
-        if (charIndex < line.length) {
-          consoleInitial.innerHTML = messages.slice(0, lineIndex).join("<br>") + "<br>" + line.slice(0, charIndex);
-          playTypeSound();
-          charIndex++;
-          setTimeout(typeLine, 30);
-        } else {
+        const previousContent = messages.slice(0, lineIndex).join("<br>");
+        typeText(messages[lineIndex], consoleInitial, () => {
+          consoleInitial.innerHTML = previousContent + (previousContent ? "<br>" : "") + messages[lineIndex];
           lineIndex++;
-          charIndex = 0;
-          setTimeout(typeLine, 500);
-        }
+          setTimeout(typeInitialMessages, 500);
+        });
       } else {
+        showDebugMessage("Starting loading simulation");
         simulateLoading();
       }
     }
@@ -258,55 +259,38 @@
           consoleInitial.style.display = "none";
           consoleArticles.style.display = "block";
           consoleArticles.innerHTML = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>";
-          typeArticle();
+          showDebugMessage("Starting articles");
+          typeArticles();
         }
       }, 400);
     }
 
-    function typeArticle() {
-      console.log(`typeArticle: articleIndex=${articleIndex}, isTypingTitle=${isTypingTitle}, charIndex=${charIndex}`);
+    function typeArticles() {
       if (articleIndex < articles.length) {
         const article = articles[articleIndex];
-        if (isTypingTitle) {
-          if (charIndex < article.title.length) {
-            const previousContent = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>" +
-              articles.slice(0, articleIndex).map(a => `${a.title}<br>→ ${a.link}`).join("<br><br>");
-            consoleArticles.innerHTML = previousContent + "<br>" + article.title.slice(0, charIndex) +
-              `<br><span style="color: #00FF00;">(Archivo ${articleIndex + 1} de ${articles.length})</span>`;
-            playTypeSound();
-            charIndex++;
-            setTimeout(typeArticle, 30);
-          } else {
-            console.log(`Finished typing title: ${article.title}`);
-            isTypingTitle = false;
-            charIndex = 0;
-            typeSound.pause();
-            setTimeout(showLink, 200);
-          }
-        }
+        const previousContent = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>" +
+          articles.slice(0, articleIndex).map(a => `${a.title}<br>→ ${a.link}`).join("<br><br>");
+        consoleArticles.innerHTML = previousContent + (previousContent ? "<br>" : "");
+        showDebugMessage(`Typing article ${articleIndex + 1}: ${article.title}`);
+        typeText(article.title + `<br><span style="color: #00FF00;">(Archivo ${articleIndex + 1} de ${articles.length})</span>`, 
+                 consoleArticles, 
+                 () => {
+                   showDebugMessage(`Finished typing article ${articleIndex + 1}, showing link`);
+                   consoleArticles.innerHTML = previousContent + (previousContent ? "<br>" : "") + 
+                     article.title + `<br><span class='link'>→ ${article.link}</span>` + 
+                     `<br><span style="color: #00FF00;">(Archivo ${articleIndex + 1} de ${articles.length})</span>`;
+                   const linkElement = consoleArticles.querySelector(".link:last-child");
+                   linkElement.classList.add("visible");
+                   articleIndex++;
+                   setTimeout(typeArticles, 500);
+                 });
       } else {
-        console.log("All articles displayed, showing final message");
+        showDebugMessage("All articles displayed, showing final message");
         showFinalMessage();
       }
     }
 
-    function showLink() {
-      console.log(`showLink: articleIndex=${articleIndex}`);
-      const article = articles[articleIndex];
-      const previousContent = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>" +
-        articles.slice(0, articleIndex).map(a => `${a.title}<br>→ ${a.link}`).join("<br><br>");
-      consoleArticles.innerHTML = previousContent + "<br>" + article.title + "<br><span class='link'>→ " + article.link + "</span>" +
-        `<br><span style="color: #00FF00;">(Archivo ${articleIndex + 1} de ${articles.length})</span>`;
-      const linkElement = consoleArticles.querySelector(".link:last-child");
-      linkElement.classList.add("visible");
-      articleIndex++;
-      isTypingTitle = true;
-      charIndex = 0;
-      setTimeout(typeArticle, 500);
-    }
-
     function showFinalMessage() {
-      console.log("Displaying final message");
       consoleArticles.innerHTML = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>" +
         articles.map(a => `${a.title}<br>→ ${a.link}`).join("<br><br>") + "<br><br>" + finalMessage.replace(/\n/g, "<br>");
       typeSound.pause();
@@ -318,14 +302,6 @@
         typeSound.currentTime = 0;
         typeSound.play().catch(() => {});
       }
-    }
-
-    function showErrorMessage(message) {
-      const errorDiv = document.createElement("div");
-      errorDiv.className = "error-message";
-      errorDiv.textContent = message;
-      document.body.appendChild(errorDiv);
-      setTimeout(() => errorDiv.remove(), 5000);
     }
   </script>
 </body>
