@@ -49,7 +49,6 @@
       font-size: 0.8rem;
       z-index: 20;
     }
-    /* Estilos para el botón "ÚNETE A LA RED" */
     .join-button {
       display: inline-block;
       background-color: #00FF00;
@@ -65,6 +64,34 @@
       background-color: #ffffff;
       color: #00FF00;
     }
+    .activation-button, .restricted-button {
+      display: block;
+      margin: 20px auto;
+      background-color: transparent;
+      border: 2px solid #00FF00;
+      color: #00FF00;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-family: 'Courier New', Courier, monospace;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+    .restricted-button {
+      border-color: #FF0000;
+      color: #FF0000;
+    }
+    .activation-button:hover {
+      background-color: #00FF00;
+      color: #000000;
+      text-shadow: 0 0 5px #00FF00;
+    }
+    .restricted-button:hover {
+      background-color: #FF0000;
+      color: #000000;
+      text-shadow: 0 0 5px #FF0000;
+    }
     @media (max-width: 600px) {
       body {
         padding: 15px;
@@ -75,6 +102,10 @@
       .console {
         font-size: 0.8rem;
       }
+      .activation-button, .restricted-button {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+      }
     }
     @keyframes blink {
       50% { opacity: 0; }
@@ -83,10 +114,12 @@
 </head>
 <body>
   <h1>SKYNET // SECTOR ONLINE</h1>
+  <button class="activation-button" id="activation-button">INFILTRAR</button>
+  <button class="restricted-button" id="restricted-button">ACCEDER A ESPACIO RESTRINGIDO</button>
   <audio id="type-sound" src="https://cdn.jsdelivr.net/gh/naptha/talktype@main/examples/assets/keyboard.wav" preload="auto"></audio>
   <audio id="intro-sound" src="assets/intro.mp3" preload="auto"></audio>
   <div class="sound-toggle" id="sound-toggle">🔊 Activar sonido</div>
-  <div class="console" id="console-initial"></div>
+  <div class="console" id="console-initial" style="display: none;"></div>
   <div class="console" id="console-articles" style="display: none;"></div>
 
   <script>
@@ -132,7 +165,7 @@
         link: '<a href="https://manacorcomarcal.com/la-pendiente-del-apocalipsis-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/la-pendiente-del-apocalipsis-por-jordi-skynet/</a>'
       }
     ];
-    
+
     const finalMessage = ">> FIN DE ARCHIVOS DISPONIBLES\n>> ¿SIGUES INVESTIGANDO?\n<div style=\"text-align:center;\"><a class=\"join-button\" href=\"registro-skynet.html\">ÚNETE A LA RED</a></div>";
 
     const consoleInitial = document.getElementById("console-initial");
@@ -140,12 +173,15 @@
     const typeSound = document.getElementById("type-sound");
     const introSound = document.getElementById("intro-sound");
     const soundToggle = document.getElementById("sound-toggle");
+    const activationButton = document.getElementById("activation-button");
+    const restrictedButton = document.getElementById("restricted-button");
 
     let lineIndex = 0;
     let charIndex = 0;
     let articleIndex = 0;
     let isTypingTitle = true;
     let soundEnabled = localStorage.getItem("soundEnabled") === "true";
+    let isActivated = false;
 
     // Depuración de carga de audio
     introSound.addEventListener("loadeddata", () => console.log("Audio intro.mp3 loaded successfully"));
@@ -177,17 +213,33 @@
       }
     });
 
-    // Reanudar audio si estaba activado
-    if (soundEnabled) {
-      const savedTime = parseFloat(localStorage.getItem("audioTime")) || 0;
-      introSound.currentTime = savedTime;
-      try {
-        introSound.play().catch((e) => console.error("Error playing introSound on load:", e));
-      } catch (e) {
-        console.error("Error playing introSound on load:", e);
+    // Función para iniciar la animación
+    function startAnimation() {
+      if (!isActivated) {
+        isActivated = true;
+        soundEnabled = true; // Activar sonido automáticamente
+        localStorage.setItem("soundEnabled", soundEnabled);
+        soundToggle.textContent = "🔇 Silenciar sonido";
+        activationButton.style.display = "none";
+        restrictedButton.style.display = "none";
+        consoleInitial.style.display = "block";
+        soundToggle.style.display = "block";
+        if (soundEnabled) {
+          const savedTime = parseFloat(localStorage.getItem("audioTime")) || 0;
+          introSound.currentTime = savedTime;
+          try {
+            introSound.play().catch((e) => console.error("Error playing introSound:", e));
+          } catch (e) {
+            console.error("Error playing introSound:", e);
+          }
+        }
+        typeLine();
       }
-      soundToggle.textContent = "🔇 Silenciar sonido";
     }
+
+    // Eventos para los botones
+    activationButton.addEventListener("click", startAnimation);
+    restrictedButton.addEventListener("click", startAnimation);
 
     function typeLine() {
       if (lineIndex < messages.length) {
@@ -265,16 +317,13 @@
     }
 
     function playTypeSound() {
-      if (charIndex % 2 === 0) {
+      if (soundEnabled && charIndex % 2 === 0) {
         typeSound.currentTime = 0;
         try {
           typeSound.play().catch(() => {});
         } catch (e) {}
       }
     }
-
-    // Iniciar la animación
-    typeLine();
   </script>
 </body>
 </html>
