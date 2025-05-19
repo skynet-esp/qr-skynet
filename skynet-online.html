@@ -49,6 +49,22 @@
       font-size: 0.8rem;
       z-index: 20;
     }
+    /* Estilos para el botón "ÚNETE A LA RED" */
+    .join-button {
+      display: inline-block;
+      background-color: #00FF00;
+      color: #000000;
+      padding: 8px 16px;
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .join-button:hover {
+      background-color: #ffffff;
+      color: #00FF00;
+    }
     @media (max-width: 600px) {
       body {
         padding: 15px;
@@ -117,7 +133,7 @@
       }
     ];
     
-    const finalMessage = ">> FIN DE ARCHIVOS DISPONIBLES\n>> ¿SIGUES INVESTIGANDO?\n<div style=\"text-align:center;\"><a class=\"button-link\" href=\"registro-skynet.html\">ÚNETE A LA RED</a></div>";
+    const finalMessage = ">> FIN DE ARCHIVOS DISPONIBLES\n>> ¿SIGUES INVESTIGANDO?\n<div style=\"text-align:center;\"><a class=\"join-button\" href=\"registro-skynet.html\">ÚNETE A LA RED</a></div>";
 
     const consoleInitial = document.getElementById("console-initial");
     const consoleArticles = document.getElementById("console-articles");
