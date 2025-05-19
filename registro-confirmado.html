@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmación Skynet</title>
+  <style>
+    body {
+      background-color: black;
+      color: #00FF00;
+      font-family: 'Courier New', Courier, monospace;
+      padding: 40px;
+      overflow: hidden;
+    }
+    .console {
+      max-width: 700px;
+      margin: 60px auto;
+      font-size: 1.1em;
+      line-height: 1.6em;
+      white-space: pre-wrap;
+    }
+    a.button {
+      display: block;
+      width: fit-content;
+      margin: 40px auto 0;
+      padding: 12px 25px;
+      background-color: #00FF00;
+      color: black;
+      font-weight: bold;
+      text-decoration: none;
+      border-radius: 8px;
+      box-shadow: 0 0 15px #00FF00;
+      text-align: center;
+      text-transform: uppercase;
+    }
+    a.button:hover {
+      background-color: #00cc00;
+    }
+  </style>
+</head>
+<body>
+  <div class="console" id="console"></div>
+  <a href="skynet-online.html" class="button">Volver a los archivos</a>
+
+  <script>
+    const texto = [
+      ">> PROCESANDO CREDENCIALES...",
+      ">> AGENTE AUTORIZADO",
+      ">> REGISTRO COMPLETADO",
+      ">> A PARTIR DE AHORA, RECIBIRÁS LAS TRANSMISIONES",
+      ">> BIENVENIDO A LA RED DE SKYNET"
+    ];
+
+    let index = 0;
+    let char = 0;
+    const consola = document.getElementById("console");
+
+    function escribirLinea() {
+      if (index < texto.length) {
+        const linea = texto[index];
+        if (char <= linea.length) {
+          consola.innerHTML = texto.slice(0, index).join("\n") + "\n" + linea.slice(0, char);
+          char++;
+          setTimeout(escribirLinea, 40);
+        } else {
+          char = 0;
+          index++;
+          setTimeout(escribirLinea, 500);
+        }
+      }
+    }
+
+    escribirLinea();
+  </script>
+</body>
+</html>
