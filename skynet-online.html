@@ -230,4 +230,35 @@
 
     function showLink() {
       const article = articles[articleIndex];
-      const previousContent = messages.join("<br
+      const previousContent = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>" +
+        articles.slice(0, articleIndex).map(a => `${a.title}<br>→ ${a.link}`).join("<br><br>");
+      consoleArticles.innerHTML = previousContent + "<br>" + article.title + "<br><span class='link'>→ " + article.link + "</span>";
+      const linkElement = consoleArticles.querySelector(".link:last-child");
+      setTimeout(() => {
+        linkElement.classList.add("visible");
+        articleIndex++;
+        isTypingTitle = true;
+        charIndex = 0;
+        setTimeout(typeArticle, 500);
+      }, 200);
+    }
+
+    function showFinalMessage() {
+      consoleArticles.innerHTML = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>" +
+        articles.map(a => `${a.title}<br>→ ${a.link}`).join("<br><br>") + "<br><br>" + finalMessage.replace(/\n/g, "<br>");
+    }
+
+    function playTypeSound() {
+      if (charIndex % 2 === 0) {
+        typeSound.currentTime = 0;
+        try {
+          typeSound.play().catch(() => {});
+        } catch (e) {}
+      }
+    }
+
+    // Iniciar la animación
+    typeLine();
+  </script>
+</body>
+</html>
