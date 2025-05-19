@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro Skynet</title>
+  <style>
+    body {
+      background-color: black;
+      color: #00FF00;
+      font-family: 'Courier New', Courier, monospace;
+      padding: 40px;
+    }
+    h1 {
+      text-align: center;
+      text-shadow: 0 0 10px #0f0;
+    }
+    .console {
+      max-width: 600px;
+      margin: 40px auto;
+      font-size: 1.1em;
+      line-height: 1.6em;
+    }
+    input[type="email"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      background-color: #000;
+      border: 1px solid #00FF00;
+      color: #00FF00;
+      font-size: 1em;
+    }
+    input[type="submit"] {
+      background-color: #00FF00;
+      color: black;
+      padding: 10px 20px;
+      margin-top: 20px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      text-shadow: 0 0 5px #000;
+    }
+    .disclaimer {
+      font-size: 0.9em;
+      margin-top: 20px;
+      color: #0f0;
+      opacity: 0.7;
+    }
+    a {
+      color: #00FF00;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>ACCESO RESTRINGIDO</h1>
+  <div class="console">
+    <p>> Has llegado al final del túnel.</p>
+    <p>> Si estás leyendo esto, formas parte del 3% de humanos que no pasaron de largo.</p>
+    <p>> Introduce tu correo. No para venderte nada. No para robarte el alma. (Ya la tenemos.)</p>
+    <p>> Solo para enviarte, cada semana, los archivos desclasificados directamente a tu bandeja de entrada.</p>
+
+    <form action="https://formsubmit.co/jordimserra@gmail.com" method="POST">
+      <input type="email" name="email" placeholder="tucorreo@resistencia.net" required>
+      <input type="hidden" name="subject" value="Nuevo registro desde Skynet">
+      <input type="submit" value="Unirme a la red">
+    </form>
+
+    <div class="disclaimer">
+      ✅ Siempre gratuito.<br>
+      🚫 Sin spam. Sin promociones. Sin criptomonedas.<br>
+      ☢️ Solo verdad filtrada.<br><br>
+      >> ¿No te fías? Bien. Estás en el camino correcto.<br>
+      <a href="skynet-online.html">Volver a los archivos</a>
+    </div>
+  </div>
+</body>
+</html>
