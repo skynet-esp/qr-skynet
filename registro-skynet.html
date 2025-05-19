@@ -56,17 +56,53 @@
       color: #00FF00;
       text-decoration: underline;
     }
+    .restricted-button {
+      display: block;
+      margin: 20px auto;
+      background-color: transparent;
+      border: 2px solid #00FF00;
+      color: #00FF00;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-family: 'Courier New', Courier, monospace;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+    .restricted-button:hover {
+      background-color: #00FF00;
+      color: #000000;
+      text-shadow: 0 0 5px #00FF00;
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 15px;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+      .console {
+        font-size: 1em;
+      }
+      .restricted-button {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+      }
+    }
   </style>
 </head>
 <body>
   <h1>ACCESO RESTRINGIDO</h1>
-  <div class="console">
-    <p>> Has llegado al final del túnel.</p>
-    <p>> Si estás leyendo esto, formas parte del 3% de humanos que no pasaron de largo.</p>
-    <p>> Introduce tu correo. No para venderte nada. No para robarte el alma. (Ya la tenemos.)</p>
-    <p>> Solo para enviarte, cada semana, los archivos desclasificados directamente a tu bandeja de entrada.</p>
+  <button class="restricted-button" id="restricted-button">ACCEDER A ESPACIO RESTRINGIDO</button>
+  <audio id="type-sound" src="assets/key.mp3" preload="auto"></audio>
+  <div class="console" id="console" style="display: none;">
+    <p id="message1">> Has llegado al final del túnel.</p>
+    <p id="message2">> Si estás leyendo esto, formas parte del 3% de humanos que no pasaron de largo.</p>
+    <p id="message3">> Introduce tu correo. No para venderte nada. No para robarte el alma. (Ya la tenemos.)</p>
+    <p id="message4">> Solo para enviarte, cada semana, los archivos desclasificados directamente a tu bandeja de entrada.</p>
 
-    <form action="https://formsubmit.co/jordimserra@gmail.com" method="POST">
+    <form action="https://formsubmit.co/jordimserra@gmail.com" method="POST" style="display: none;" id="email-form">
       <input type="hidden" name="_captcha" value="false">
       <input type="text" name="_honey" style="display:none">
       <input type="hidden" name="_next" value="https://skynet-esp.github.io/qr-skynet/registro-confirmado.html">
@@ -75,7 +111,7 @@
       <input type="submit" value="Unirme a la red">
     </form>
 
-    <div class="disclaimer">
+    <div class="disclaimer" id="disclaimer" style="display: none;">
       ✅ Siempre gratuito.<br>
       🚫 Sin spam. Sin promociones. Sin criptomonedas.<br>
       ☢️ Solo verdad filtrada.<br><br>
@@ -83,5 +119,88 @@
       <a href="skynet-online.html">Volver a los archivos</a>
     </div>
   </div>
+
+  <script>
+    const messages = [
+      "> Has llegado al final del túnel.",
+      "> Si estás leyendo esto, formas parte del 3% de humanos que no pasaron de largo.",
+      "> Introduce tu correo. No para venderte nada. No para robarte el alma. (Ya la tenemos.)",
+      "> Solo para enviarte, cada semana, los archivos desclasificados directamente a tu bandeja de entrada."
+    ];
+
+    const consoleElement = document.getElementById("console");
+    const messageElements = [
+      document.getElementById("message1"),
+      document.getElementById("message2"),
+      document.getElementById("message3"),
+      document.getElementById("message4")
+    ];
+    const emailForm = document.getElementById("email-form");
+    const disclaimer = document.getElementById("disclaimer");
+    const restrictedButton = document.getElementById("restricted-button");
+    const typeSound = document.getElementById("type-sound");
+
+    let messageIndex = 0;
+    let charIndex = 0;
+    let isActivated = false;
+    let soundEnabled = false;
+
+    // Depuración de carga de audio
+    typeSound.addEventListener("loadeddata", () => console.log("Audio key.mp3 loaded successfully"));
+    typeSound.addEventListener("error", () => console.error("Failed to load key.mp3: Check the path assets/key.mp3"));
+
+    // Botón para iniciar la animación
+    restrictedButton.addEventListener("click", () => {
+      if (!isActivated) {
+        console.log("Restricted button clicked, starting animation");
+        isActivated = true;
+        soundEnabled = true;
+        localStorage.setItem("soundEnabled", soundEnabled);
+        restrictedButton.style.display = "none";
+        consoleElement.style.display = "block";
+        console.log("Attempting to play typeSound on button click");
+        try {
+          typeSound.currentTime = 0;
+          typeSound.play().catch((e) => console.error("Error playing typeSound on button click:", e));
+        } catch (e) {
+          console.error("Error playing typeSound on button click:", e);
+        }
+        typeMessage();
+      }
+    });
+
+    function typeMessage() {
+      if (messageIndex < messages.length) {
+        const message = messages[messageIndex];
+        if (charIndex <= message.length) {
+          messageElements[messageIndex].innerHTML = message.slice(0, charIndex);
+          playTypeSound();
+          charIndex++;
+          setTimeout(typeMessage, 30);
+        } else {
+          charIndex = 0;
+          messageIndex++;
+          setTimeout(typeMessage, 500);
+        }
+      } else {
+        console.log("All messages typed, showing form and disclaimer");
+        emailForm.style.display = "block";
+        disclaimer.style.display = "block";
+        typeSound.pause();
+      }
+    }
+
+    function playTypeSound() {
+      if (soundEnabled && charIndex % 2 === 0) {
+        console.log("Attempting to play typeSound (key.mp3)");
+        typeSound.currentTime = 0;
+        try {
+          typeSound.play().catch((e) => console.error("Error playing typeSound (key.mp3):", e));
+        } catch (e) {
+          console.error("Error playing typeSound (key.mp3):", e);
+        }
+      }
+    }
+  </script>
 </body>
 </html>
