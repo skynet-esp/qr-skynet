@@ -97,11 +97,7 @@
   <button class="restricted-button" id="restricted-button">ACCEDER A ESPACIO RESTRINGIDO</button>
   <audio id="type-sound" src="assets/key.mp3" preload="auto"></audio>
   <div class="console" id="console" style="display: none;">
-    <p id="message1">> Has llegado al final del túnel.</p>
-    <p id="message2">> Si estás leyendo esto, formas parte del 3% de humanos que no pasaron de largo.</p>
-    <p id="message3">> Introduce tu correo. No para venderte nada. No para robarte el alma. (Ya la tenemos.)</p>
-    <p id="message4">> Solo para enviarte, cada semana, los archivos desclasificados directamente a tu bandeja de entrada.</p>
-
+    <!-- Los mensajes se crearán dinámicamente -->
     <form action="https://formsubmit.co/jordimserra@gmail.com" method="POST" style="display: none;" id="email-form">
       <input type="hidden" name="_captcha" value="false">
       <input type="text" name="_honey" style="display:none">
@@ -110,7 +106,6 @@
       <input type="hidden" name="subject" value="Nuevo registro desde Skynet">
       <input type="submit" value="Unirme a la red">
     </form>
-
     <div class="disclaimer" id="disclaimer" style="display: none;">
       ✅ Siempre gratuito.<br>
       🚫 Sin spam. Sin promociones. Sin criptomonedas.<br>
@@ -129,12 +124,6 @@
     ];
 
     const consoleElement = document.getElementById("console");
-    const messageElements = [
-      document.getElementById("message1"),
-      document.getElementById("message2"),
-      document.getElementById("message3"),
-      document.getElementById("message4")
-    ];
     const emailForm = document.getElementById("email-form");
     const disclaimer = document.getElementById("disclaimer");
     const restrictedButton = document.getElementById("restricted-button");
@@ -144,6 +133,7 @@
     let charIndex = 0;
     let isActivated = false;
     let soundEnabled = false;
+    let messageElements = [];
 
     // Depuración de carga de audio
     typeSound.addEventListener("loadeddata", () => console.log("Audio key.mp3 loaded successfully"));
@@ -171,6 +161,13 @@
 
     function typeMessage() {
       if (messageIndex < messages.length) {
+        // Crear elemento <p> para el mensaje actual si no existe
+        if (!messageElements[messageIndex]) {
+          const p = document.createElement("p");
+          p.id = `message${messageIndex + 1}`;
+          consoleElement.insertBefore(p, emailForm);
+          messageElements[messageIndex] = p;
+        }
         const message = messages[messageIndex];
         if (charIndex <= message.length) {
           messageElements[messageIndex].innerHTML = message.slice(0, charIndex);
