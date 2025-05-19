@@ -173,7 +173,7 @@
     let charIndex = 0;
     let articleIndex = 0;
     let isTypingTitle = true;
-    let soundEnabled = false; // Inicialmente desactivado
+    let soundEnabled = false;
     let isActivated = false;
 
     // Inicializar toggle de sonido
@@ -216,7 +216,7 @@
     activationButton.addEventListener("click", () => {
       if (!isActivated) {
         isActivated = true;
-        soundEnabled = true; // Activar sonido automáticamente
+        soundEnabled = true;
         sessionStorage.setItem("soundEnabled", soundEnabled);
         soundToggle.textContent = "🔇 Silenciar sonido";
         activationButton.style.display = "none";
@@ -233,11 +233,11 @@
     function typeLine() {
       if (lineIndex < messages.length) {
         const line = messages[lineIndex];
-        if (charIndex <= line.length) {
+        if (charIndex < line.length) {
           consoleInitial.innerHTML = messages.slice(0, lineIndex).join("<br>") + "<br>" + line.slice(0, charIndex);
           playTypeSound();
           charIndex++;
-          requestAnimationFrame(typeLine);
+          setTimeout(typeLine, 30);
         } else {
           lineIndex++;
           charIndex = 0;
@@ -264,46 +264,49 @@
     }
 
     function typeArticle() {
+      console.log(`typeArticle: articleIndex=${articleIndex}, isTypingTitle=${isTypingTitle}, charIndex=${charIndex}`);
       if (articleIndex < articles.length) {
         const article = articles[articleIndex];
         if (isTypingTitle) {
-          if (charIndex < article.title.length) { // Cambiado <= a < para evitar desbordamiento
+          if (charIndex < article.title.length) {
             const previousContent = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>" +
               articles.slice(0, articleIndex).map(a => `${a.title}<br>→ ${a.link}`).join("<br><br>");
             consoleArticles.innerHTML = previousContent + "<br>" + article.title.slice(0, charIndex) +
               `<br><span style="color: #00FF00;">(Archivo ${articleIndex + 1} de ${articles.length})</span>`;
             playTypeSound();
             charIndex++;
-            requestAnimationFrame(typeArticle);
+            setTimeout(typeArticle, 30);
           } else {
+            console.log(`Finished typing title: ${article.title}`);
             isTypingTitle = false;
             charIndex = 0;
-            typeSound.pause(); // Detener sonido al terminar título
-            showLink();
+            typeSound.pause();
+            setTimeout(showLink, 200);
           }
         }
       } else {
+        console.log("All articles displayed, showing final message");
         showFinalMessage();
       }
     }
 
     function showLink() {
+      console.log(`showLink: articleIndex=${articleIndex}`);
       const article = articles[articleIndex];
       const previousContent = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>" +
         articles.slice(0, articleIndex).map(a => `${a.title}<br>→ ${a.link}`).join("<br><br>");
       consoleArticles.innerHTML = previousContent + "<br>" + article.title + "<br><span class='link'>→ " + article.link + "</span>" +
         `<br><span style="color: #00FF00;">(Archivo ${articleIndex + 1} de ${articles.length})</span>`;
       const linkElement = consoleArticles.querySelector(".link:last-child");
-      setTimeout(() => {
-        linkElement.classList.add("visible");
-        articleIndex++;
-        isTypingTitle = true;
-        charIndex = 0;
-        setTimeout(typeArticle, 500);
-      }, 200);
+      linkElement.classList.add("visible");
+      articleIndex++;
+      isTypingTitle = true;
+      charIndex = 0;
+      setTimeout(typeArticle, 500);
     }
 
     function showFinalMessage() {
+      console.log("Displaying final message");
       consoleArticles.innerHTML = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>" +
         articles.map(a => `${a.title}<br>→ ${a.link}`).join("<br><br>") + "<br><br>" + finalMessage.replace(/\n/g, "<br>");
       typeSound.pause();
@@ -312,7 +315,7 @@
 
     function playTypeSound() {
       if (soundEnabled && isActivated) {
-        typeSound.currentTime = 0; // Reiniciar para simular pulsación
+        typeSound.currentTime = 0;
         typeSound.play().catch(() => {});
       }
     }
