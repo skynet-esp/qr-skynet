@@ -9,7 +9,7 @@
       background-color: black;
       color: #00FF00;
       font-family: 'Courier New', Courier, monospace;
-      padding: 20px;
+      padding      padding: 20px;
       margin: 0;
     }
     h1 {
@@ -65,6 +65,26 @@
       background-color: #ffffff;
       color: #00FF00;
     }
+    /* Estilos para el botón de activación "PARTICIPANDO" */
+    .activation-button {
+      display: block;
+      margin: 50px auto;
+      background-color: transparent;
+      border: 2px solid #00FF00;
+      color: #00FF00;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-family: 'Courier New', Courier, monospace;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+    .activation-button:hover {
+      background-color: #00FF00;
+      color: #000000;
+      text-shadow: 0 0 5px #00FF00;
+    }
     @media (max-width: 600px) {
       body {
         padding: 15px;
@@ -75,6 +95,10 @@
       .console {
         font-size: 0.8rem;
       }
+      .activation-button {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+      }
     }
     @keyframes blink {
       50% { opacity: 0; }
@@ -83,10 +107,15 @@
 </head>
 <body>
   <h1>SKYNET // SECTOR ONLINE</h1>
-  <audio id="type-sound" src="https://cdn.jsdelivr.net/gh/naptha/talktype@main/examples/assets/keyboard.wav" preload="auto"></audio>
+  <!-- Botón de activación -->
+  <button class="activation-button" id="activation-button">PARTICIPANDO</button>
+  <!-- Audio para el efecto de escritura (key.mp3 en assets) -->
+  <audio id="type-sound" src="assets/key.mp3" preload="auto" loop></ ہے
+
+System: audio>
   <audio id="intro-sound" src="assets/intro.mp3" preload="auto"></audio>
   <div class="sound-toggle" id="sound-toggle">🔊 Activar sonido</div>
-  <div class="console" id="console-initial"></div>
+  <div class="console" id="console-initial" style="display: none;"></div>
   <div class="console" id="console-articles" style="display: none;"></div>
 
   <script>
@@ -101,15 +130,7 @@
     const articles = [
       {
         title: "[🧠] El algoritmo de Pedro",
-        link: '<a href="https://manacorcomarcal.com/el-algoritmo-de-pedro-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/el-algoritmo-de-pedro-por-jordi-skynet/</a>'
-      },
-      {
-        title: "[🎭] Fins als ous: La isla de los figurantes",
-        link: '<a href="https://manacorcomarcal.com/fins-als-ous-la-isla-de-los-figurantes-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/fins-als-ous-la-isla-de-los-figurantes-por-jordi-skynet/</a>'
-      },
-      {
-        title: "[📚] En Miquel Galliner i el gegant del REGA",
-        link: '<a href="https://manacorcomarcal.com/en-miquel-galliner-i-el-gegant-del-rega-per-jordi-skynet/" target="_blank">https://manacorcomarcal.com/en-miquel-galliner-i-el-gegant-del-rega-per-jordi-skynet/</a>'
+        link: '<a href="https://manacor-gegant-del-rega-per-jordi-skynet/" target="_blank">https://manacorcomarcal.com/en-miquel-galliner-i-el-gegant-del-rega-per-jordi-skynet/</a>'
       },
       {
         title: "[✏️] Del lápiz al prompt: el salto invisible",
@@ -132,7 +153,7 @@
         link: '<a href="https://manacorcomarcal.com/la-pendiente-del-apocalipsis-por-jordi-skynet/" target="_blank">https://manacorcomarcal.com/la-pendiente-del-apocalipsis-por-jordi-skynet/</a>'
       }
     ];
-    
+
     const finalMessage = ">> FIN DE ARCHIVOS DISPONIBLES\n>> ¿SIGUES INVESTIGANDO?\n<div style=\"text-align:center;\"><a class=\"join-button\" href=\"registro-skynet.html\">ÚNETE A LA RED</a></div>";
 
     const consoleInitial = document.getElementById("console-initial");
@@ -140,18 +161,20 @@
     const typeSound = document.getElementById("type-sound");
     const introSound = document.getElementById("intro-sound");
     const soundToggle = document.getElementById("sound-toggle");
+    const activationButton = document.getElementById("activation-button");
 
     let lineIndex = 0;
     let charIndex = 0;
     let articleIndex = 0;
     let isTypingTitle = true;
     let soundEnabled = localStorage.getItem("soundEnabled") === "true";
+    let isActivated = false; // Controla si se ha presionado el botón
 
     // Depuración de carga de audio
     introSound.addEventListener("loadeddata", () => console.log("Audio intro.mp3 loaded successfully"));
     introSound.addEventListener("error", () => console.error("Failed to load intro.mp3: Check the path assets/intro.mp3"));
-    typeSound.addEventListener("loadeddata", () => console.log("Audio keyboard.wav loaded successfully"));
-    typeSound.addEventListener("error", () => console.error("Failed to load keyboard.wav"));
+    typeSound.addEventListener("loadeddata", () => console.log("Audio key.mp3 loaded successfully"));
+    typeSound.addEventListener("error", () => console.error("Failed to load key.mp3: Check the path assets/key.mp3"));
 
     // Actualizar posición del audio
     introSound.addEventListener("timeupdate", () => {
@@ -165,7 +188,7 @@
       soundEnabled = !soundEnabled;
       localStorage.setItem("soundEnabled", soundEnabled);
       soundToggle.textContent = soundEnabled ? "🔇 Silenciar sonido" : "🔊 Activar sonido";
-      if (soundEnabled) {
+      if (soundEnabled && isActivated) {
         try {
           introSound.play().catch((e) => console.error("Error playing introSound:", e));
         } catch (e) {
@@ -177,17 +200,23 @@
       }
     });
 
-    // Reanudar audio si estaba activado
-    if (soundEnabled) {
-      const savedTime = parseFloat(localStorage.getItem("audioTime")) || 0;
-      introSound.currentTime = savedTime;
-      try {
-        introSound.play().catch((e) => console.error("Error playing introSound on load:", e));
-      } catch (e) {
-        console.error("Error playing introSound on load:", e);
+    // Evento para el botón de activación
+    activationButton.addEventListener("click", () => {
+      if (!isActivated) {
+        isActivated = true;
+        activationButton.style.display = "none"; // Ocultar botón
+        consoleInitial.style.display = "block"; // Mostrar consola inicial
+        soundToggle.style.display = "block"; // Mostrar toggle de sonido
+        if (soundEnabled) {
+          try {
+            introSound.play().catch((e) => console.error("Error playing introSound on activation:", e));
+          } catch (e) {
+            console.error("Error playing introSound on activation:", e);
+          }
+        }
+        typeLine(); // Iniciar animación
       }
-      soundToggle.textContent = "🔇 Silenciar sonido";
-    }
+    });
 
     function typeLine() {
       if (lineIndex < messages.length) {
@@ -262,19 +291,16 @@
     function showFinalMessage() {
       consoleArticles.innerHTML = messages.join("<br>") + "<br><br>ACCESO A ARCHIVOS DESCLASIFICADOS:<br><br>" +
         articles.map(a => `${a.title}<br>→ ${a.link}`).join("<br><br>") + "<br><br>" + finalMessage.replace(/\n/g, "<br>");
+      typeSound.pause(); // Detener key.mp3 al finalizar
     }
 
     function playTypeSound() {
-      if (charIndex % 2 === 0) {
-        typeSound.currentTime = 0;
+      if (soundEnabled && isActivated) {
         try {
           typeSound.play().catch(() => {});
         } catch (e) {}
       }
     }
-
-    // Iniciar la animación
-    typeLine();
   </script>
 </body>
 </html>
