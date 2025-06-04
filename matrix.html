@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Matrix Effect</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: black;
+      color: #00FF00;
+      font-family: monospace;
+    }
+    #matrix {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    h1 {
+      position: absolute;
+      top: 40%;
+      width: 100%;
+      text-align: center;
+      font-size: 48px;
+      animation: glow 2s ease-in-out infinite alternate;
+      z-index: 10;
+    }
+    @keyframes glow {
+      from { text-shadow: 0 0 10px #00FF00; }
+      to { text-shadow: 0 0 20px #00FF00; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Bienvenido a la Matrix</h1>
+  <canvas id="matrix"></canvas>
+  <script>
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const characters = "アカサタナハマヤラワ0123456789ABCDEFGHIJKLMNOPQRSTUVXYZ";
+    const fontSize = 16;
+    const columns = Math.floor(canvas.width / fontSize);
+    const drops = Array(columns).fill(0);
+
+    function draw() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#0F0';
+      ctx.font = fontSize + 'px monospace';
+      for (let i = 0; i < drops.length; i++) {
+        const text = characters.charAt(Math.floor(Math.random() * characters.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+        drops[i]++;
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+      }
+    }
+
+    setInterval(draw, 50);
+  </script>
+</body>
+</html>
